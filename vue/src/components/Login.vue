@@ -17,37 +17,84 @@
         <el-form-item label="用户名" prop="name">
           <el-input v-model="ruleForm.name"></el-input>
         </el-form-item>
+
         <el-form-item label="密码" prop="password">
-          <el-input v-model="ruleForm.password"></el-input>
+          <el-input type="password" v-model="ruleForm.password"></el-input>
+        </el-form-item>
+
+        <el-form-item label="验证码" prop="confirmCode">
+          <v-canvas @nowVal="nowVal"></v-canvas>
+          <el-input v-model="ruleForm.confirmCode"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')"
+            >提交</el-button
+          >
+          <el-button @click="handleClose">取消</el-button>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="loginVisible = false"
-          >确 定</el-button
-        >
-      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import Canvas from "./Canvas";
 export default {
   data() {
+    //  用户名校验
     let validateName = (rule, value, callback) => {
+      let regWord = /[`!#$%^&*@,.()_+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘、，|《。》？、【】[\] \u4e00-\u9fa5]/i;
+      let regName = /\w{3,9}/;
       if (!value) {
         return callback(new Error("用户名不能为空"));
+      } else if (regWord.test(value)) {
+        return callback(new Error("用户名不能有特殊符号或者中文"));
+      } else if (!regName.test(value)) {
+        return callback(
+          new Error("用户名长度必须是3到9个字符，只能包含英文和数字")
+        );
+      } else {
+        callback();
       }
     };
+
+    // 密码校验
     let validatePassword = (rule, value, callback) => {
+      let regWord = /[`!#$%^&*()_+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘、，|《。》？、【】[\] \u4e00-\u9fa5]/i;
+      let regPassword = /[\w,.@]{3,16}/;
       if (!value) {
-        return callback(new Error("用户名不能为空"));
+        return callback(new Error("密码不能为空"));
+      } else if (regWord.test(value)) {
+        return callback(new Error("密码不能有特殊符号或者中文"));
+      } else if (!regPassword.test(value)) {
+        return callback(
+          new Error(
+            "密码长度必须是3到16个字符，只能包含英文、数字和特殊字符@,."
+          )
+        );
+      } else {
+        callback();
+      }
+    };
+
+    // 验证码校验
+    let validateConfirmCode = (rule, value, callback) => {
+      if (
+        value.toString().toLowerCase() ===
+        this.ruleForm.nowConfirmCode.toString().toLowerCase()
+      ) {
+        callback();
+      } else {
+        return callback(new Error("验证码错误"));
       }
     };
     return {
       ruleForm: {
         name: "",
-        password: ""
+        password: "",
+        confirmCode: "",
+        nowConfirmCode: ""
       },
       rules: {
         name: [
@@ -61,6 +108,13 @@ export default {
           {
             required: true,
             validator: validatePassword,
+            trigger: "blur"
+          }
+        ],
+        confirmCode: [
+          {
+            required: true,
+            validator: validateConfirmCode,
             trigger: "blur"
           }
         ]
@@ -84,9 +138,51 @@ export default {
       })
         .then(() => {
           this.$emit("changeLoginVisible", false);
+          // 清空form表单的值
+          this.$refs["ruleForm"].resetFields();
         })
         .catch(err => console.log(err));
+    },
+
+    /**
+     *提交
+     */
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.$axios({
+            method: "get",
+            url: "/login",
+            params: {
+              userName: this.ruleForm.name,
+              userPassword: this.ruleForm.password
+            }
+          })
+            .then(res => {
+              if (res.data.status === 0) {
+                this.$message.success("登录成功");
+                this.$refs["ruleForm"].resetFields();
+                this.$emit("changeLoginVisible", false);
+              } else if (res.data.status === 1) {
+                this.$message.error("用户名或密码错误");
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        } else {
+          this.$message.error("请输入正确信息");
+        }
+      });
+    },
+
+    // 验证码正确的值
+    nowVal(val) {
+      this.ruleForm.nowConfirmCode = val;
     }
+  },
+  components: {
+    vCanvas: Canvas
   }
 };
 </script>

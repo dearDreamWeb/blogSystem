@@ -25,33 +25,44 @@
     <!-- 登录和注册 -->
     <el-col :xs="6" :sm="8" class="user">
       <el-button type="text" @click="loginVisible = true">登录</el-button>
-      <el-button type="text">注册</el-button>
+      <el-button type="text" @click="registerVisible = true">注册</el-button>
     </el-col>
 
     <!-- 登录模态框 -->
     <v-login :loginVisible = "loginVisible" @changeLoginVisible = "changeLoginVisible"></v-login>
+
+    <!-- 注册模态框 -->
+    <v-register :registerVisible = "registerVisible" @changeRegisterVisible = "changeRegisterVisible"></v-register>
   </el-row>
 </template>
 
 <script>
 import Login from "./Login";
+import Register from "./Register";
 
 export default {
   name: "Header",
   data() {
     return {
       searchVal: "",
-      loginVisible: false
+      loginVisible: false,
+      registerVisible: false
     };
   },
   methods: {
     // 接收子组件的自定义事件关闭模态框
     changeLoginVisible(val) {
       this.loginVisible = val;
+    },
+
+    // 接收子组件的自定义事件关闭模态框
+    changeRegisterVisible(val) {
+      this.registerVisible = val;
     }
   },
   components: {
-    vLogin: Login
+    vLogin: Login,
+    vRegister: Register
   }
 };
 </script>

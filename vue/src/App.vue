@@ -33,7 +33,7 @@ body {
   // 当对话框小于768px是铺满全屏
   .el-dialog {
     margin: 0 !important;
-    height: 100%;
+    // height: 100%;
   }
 }
 </style>

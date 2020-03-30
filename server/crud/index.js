@@ -4,7 +4,7 @@ let pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '123456',
-    database: 'test'
+    database: 'blogSystem'
 })
 query = (sql, values, callback) => {
     //连接池建立链接
