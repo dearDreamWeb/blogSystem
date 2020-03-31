@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="register">
     <el-dialog
       title="注册"
       :visible.sync="registerVisible"
@@ -77,7 +77,7 @@
         </el-form-item>
 
         <el-form-item label="验证码" prop="confirmCode">
-          <v-canvas @nowVal="nowVal"></v-canvas>
+          <v-canvas @nowVal="nowVal" :isRefresh="isRefresh"></v-canvas>
           <el-input v-model="ruleForm.confirmCode"></el-input>
         </el-form-item>
 
@@ -223,6 +223,7 @@ export default {
         nowConfirmCode: ""
       },
       cities: [],
+      isRefresh: false, // 是否刷新canvas验证码
       rules: {
         name: [
           {
@@ -327,7 +328,7 @@ export default {
         url: "/getCities"
       })
         .then(res => {
-          if (res.data.status === 0) {
+          if (res.data.state === 0) {
             this.cities = JSON.parse(res.data.cityData[0].cities);
           }
         })
@@ -353,12 +354,12 @@ export default {
               }
             })
               .then(res => {
-                if (res.data.status === 0) {
+                if (res.data.state === 0) {
                   this.$message.success("注册成功");
                   this.$refs["ruleForm"].resetFields();
                   this.ruleForm.imageUrl = "";
                   this.$emit("changeRegisterVisible", false);
-                }else if(res.data.status === 1){
+                } else if (res.data.state === 1) {
                   this.$message.success("用户名已存在，注册失败");
                 }
               })
@@ -377,7 +378,7 @@ export default {
      */
     // 上传成功    显示图片
     handleAvatarSuccess(res) {
-      if (res.status === 0) {
+      if (res.state === 0) {
         this.ruleForm.imageUrl = res.imgUrl;
       }
     },
@@ -400,6 +401,12 @@ export default {
       this.ruleForm.nowConfirmCode = val;
     }
   },
+  watch: {
+    // 监听registerVisible，当为true时，显示模态框时，改变isRefresh，让canvas组件刷新验证码
+    registerVisible(val) {
+      this.isRefresh = val;
+    }
+  },
   mounted() {
     this.init();
   },
@@ -410,7 +417,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.login {
+.register {
   .dialog {
     margin: 0 auto;
     .demo-ruleForm {

@@ -1,10 +1,11 @@
 module.exports = (app, express) => {
+    // 引入session
+    require("../session")(app);
+    
     // 创建路由
     const router = express.Router();
     app.use("/api", router);
 
-    // 引入session
-    require("../session")(app);
 
     // 使用插入到接口
     const crud = require("../crud");
@@ -20,6 +21,5 @@ module.exports = (app, express) => {
 
     // 登录和注册
     require("./login_register")(router, crud);
-
 
 }

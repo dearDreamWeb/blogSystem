@@ -5,11 +5,10 @@ module.exports = (router, crud) => {
         crud("SELECT * FROM `users` WHERE user_name=? AND user_password=?",
             [req.query.userName, req.query.userPassword], data => {
                 if (data.length > 0) {
-                    req.session = {};
                     req.session.userInfo = data[0];
-                    res.json({ status: 0 });
+                    res.json({ state: 0, user_id: req.session.userInfo.user_id });
                 } else {
-                    res.json({ status: 1 });
+                    res.json({ state: 1 });
                 }
             })
     });
@@ -31,13 +30,13 @@ module.exports = (router, crud) => {
             user_nickName: jsonDatas.nickName
         }
         crud("SELECT * FROM `users` WHERE user_name =?", [jsonDatas.name], data => {
-            // 判断用户名是否已被注册，若已注册，返回{status:1}
+            // 判断用户名是否已被注册，若已注册，返回{state:1}
             if (data.length > 0) {
-                res.json({ status: 1 })
+                res.json({ state: 1 })
             } else {
                 // 用户名未被注册，插入数据
                 crud("INSERT INTO `users` SET ?", objDatas, data => {
-                    res.json({ status: 0 });
+                    res.json({ state: 0 });
                 })
             }
         })
@@ -50,8 +49,33 @@ module.exports = (router, crud) => {
     router.post("/upload", upload, (req, res) => {
         let imgUrl = `http://localhost:3000/${req.file.filename}`;
         res.json({
-            status: 0,
+            state: 0,
             imgUrl
         });
     });
+
+
+    // 获取用户信息
+    router.get("/getUserInfo", (req, res) => {
+        if (req.session.userInfo) {
+            if (req.session.userInfo.user_id === req.query.user_id) {          
+                crud("SELECT * FROM `users` WHERE user_id = ?", [req.query.user_id], data => {
+                    if (data.length > 0) {
+                        res.json({
+                            state: 0,
+                            userInfo: data[0]
+                        })
+                    }
+                })
+            }
+        }
+    })
+
+    // 注销
+    router.get("/loginOut", (req, res) => {
+        //注销session
+        req.session.destroy(() => {
+            res.json({ state: 0 });
+        });
+    })
 }

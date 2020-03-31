@@ -23,7 +23,7 @@
         </el-form-item>
 
         <el-form-item label="验证码" prop="confirmCode">
-          <v-canvas @nowVal="nowVal"></v-canvas>
+          <v-canvas @nowVal="nowVal" :isRefresh="isRefresh"></v-canvas>
           <el-input v-model="ruleForm.confirmCode"></el-input>
         </el-form-item>
 
@@ -96,6 +96,7 @@ export default {
         confirmCode: "",
         nowConfirmCode: ""
       },
+      isRefresh: false,
       rules: {
         name: [
           {
@@ -159,11 +160,14 @@ export default {
             }
           })
             .then(res => {
-              if (res.data.status === 0) {
+              if (res.data.state === 0) {
                 this.$message.success("登录成功");
                 this.$refs["ruleForm"].resetFields();
+                // 向vuex中传入登录成功的用户的id
+                this.$store.commit("setUserInfo",res.data.user_id);
+                this.$emit("userIsLogin");
                 this.$emit("changeLoginVisible", false);
-              } else if (res.data.status === 1) {
+              } else if (res.data.state === 1) {
                 this.$message.error("用户名或密码错误");
               }
             })
@@ -179,6 +183,12 @@ export default {
     // 验证码正确的值
     nowVal(val) {
       this.ruleForm.nowConfirmCode = val;
+    }
+  },
+  watch: {
+    // 监听loginVisible，当为true时，显示模态框时，改变isRefresh，让canvas组件刷新验证码
+    loginVisible(val) {
+      this.isRefresh = val;
     }
   },
   components: {

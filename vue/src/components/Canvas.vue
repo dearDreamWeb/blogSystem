@@ -11,6 +11,12 @@
 
 <script>
 export default {
+  props: {
+    // 是否刷新
+    isRefresh: {
+      type: Boolean
+    }
+  },
   methods: {
     curCanvas() {
       let myCanvas = this.$refs.canvas;
@@ -89,6 +95,11 @@ export default {
       ctx.fillStyle = `rgb(${colorR},${colorG},${colorB})`;
       ctx.fill();
       ctx.closePath();
+    }
+  },
+  watch: {
+    isRefresh(val) {
+      val ? this.curCanvas() : false;
     }
   },
   mounted() {
