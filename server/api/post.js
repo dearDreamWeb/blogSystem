@@ -22,4 +22,17 @@ module.exports = (router, crud) => {
             })
         }
     });
+
+    /**
+     * 获取所有文章
+     */
+    router.post("/get_allPost", (req, res) => {
+        crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY post_createTime DESC", [], 
+        data => {
+            res.json({
+                state: 0,
+                allPost: data
+            });
+        });
+    });
 }
