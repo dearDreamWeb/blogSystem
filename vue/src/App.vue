@@ -1,12 +1,13 @@
 <template>
   <div id="app">
-    <v-home></v-home>
+    <!-- 头部 -->
+    <v-header></v-header>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Home from "./views/Home";
-
+import Header from "./components/Header";
 export default {
   methods: {
     init() {}
@@ -15,7 +16,7 @@ export default {
     this.init();
   },
   components: {
-    vHome: Home
+    vHeader: Header
   }
 };
 </script>
@@ -25,15 +26,24 @@ export default {
 html,
 body {
   background-color: $bgColor;
+  // margin: 0;
+}
+// 弹出框
+.el-popover {
+  min-width: auto !important;
 }
 @media screen and(max-width:767px) {
   .el-message-box {
-    width:80% !important;
+    width: 80% !important;
   }
   // 当对话框小于768px是铺满全屏
   .el-dialog {
     margin: 0 !important;
-    // height: 100%;
+  }
+
+  // 弹出框
+  .el-popover {
+    min-width: auto !important;
   }
 }
 </style>

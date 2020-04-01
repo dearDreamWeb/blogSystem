@@ -1,20 +1,15 @@
 <template>
   <div class="home">
-    <!-- 头部 -->
-    <v-header></v-header>
     <div class="container"></div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Header from "../components/Header";
 
 export default {
   name: "Home",
-  components: {
-    vHeader: Header
-  }
+  components: {}
 };
 </script>
 

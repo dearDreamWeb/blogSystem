@@ -45,7 +45,7 @@ module.exports = (router, crud) => {
 
     // 头像传入upload/avatar文件夹中
     const multer = require("multer");
-    const upload = multer({ dest: "./../upload/avatar" }).single("file");
+    const upload = multer({ dest: "../upload/avatar" }).single("file");
     router.post("/upload", upload, (req, res) => {
         let imgUrl = `http://localhost:3000/${req.file.filename}`;
         res.json({

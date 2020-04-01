@@ -25,8 +25,21 @@
 
     <!-- 登录成功显示昵称，头像和注销 -->
     <el-col :xs="6" :sm="8" class="user" v-if="isLogin">
+      <!-- 当小屏时，隐藏 -->
       <span class="userName hidden-xs-only">{{ userInfo.user_nickName }}</span>
-      <img :src="userInfo.user_avatar" alt="头像" class="avatar" />
+      <!-- 弹出框，可以选择个人中心还是写文章 -->
+      <el-popover placement="bottom" trigger="hover">
+        <ul class="popover-content">
+          <li @click="$router.push(`/about/${userInfo.user_id}`)">个人中心</li>
+          <li> <router-link :to="{name:'editPostLink'}">写文章</router-link></li>
+        </ul>
+        <img
+          slot="reference"
+          :src="userInfo.user_avatar"
+          alt="头像"
+          class="avatar"
+        />
+      </el-popover>
       <span class="loginOut" @click="loginOut">注销</span>
     </el-col>
     <!-- 登录和注册 -->
@@ -111,7 +124,12 @@ export default {
         });
     },
 
-    // 注销 成功后将sessionStorage中的用户数据清空
+    /**
+     * 注销
+     * 成功后将sessionStorage中的用户数据清空
+     * 返回首页
+     */
+
     loginOut() {
       this.$axios({
         method: "get",
@@ -122,6 +140,7 @@ export default {
             this.$message.success("注销成功");
             window.sessionStorage.removeItem("userInfo");
             this.isLogin = false;
+            this.$router.push({ name: "homeLink" });
           }
         })
         .catch(err => {
@@ -162,6 +181,9 @@ export default {
       padding: 0 0.5rem;
       width: 2rem;
       border-radius: 50%;
+      &:hover {
+        cursor: pointer;
+      }
     }
     .userName,
     .loginOut {
@@ -183,6 +205,16 @@ export default {
       .logo {
         width: 100%;
       }
+    }
+  }
+}
+
+// 改变element组件的样式
+.popover-content {
+  li {
+    &:hover {
+      cursor: pointer;
+      color: $tb_color;
     }
   }
 }
