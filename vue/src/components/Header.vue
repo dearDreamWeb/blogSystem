@@ -31,7 +31,9 @@
       <el-popover placement="bottom" trigger="hover">
         <ul class="popover-content">
           <li @click="$router.push(`/about/${userInfo.user_id}`)">个人中心</li>
-          <li> <router-link :to="{name:'editPostLink'}">写文章</router-link></li>
+          <li>
+            <router-link :to="{ name: 'editPostLink' }">写文章</router-link>
+          </li>
         </ul>
         <img
           slot="reference"
@@ -75,7 +77,7 @@ export default {
       loginVisible: false,
       registerVisible: false,
       isLogin: false,
-      userInfo: {}
+      userInfo: {},
     };
   },
   methods: {
@@ -111,15 +113,15 @@ export default {
         method: "get",
         url: "/getUserInfo",
         params: {
-          user_id
-        }
+          user_id,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.state === 0) {
             this.userInfo = res.data.userInfo;
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -133,28 +135,30 @@ export default {
     loginOut() {
       this.$axios({
         method: "get",
-        url: "/loginOut"
+        url: "/loginOut",
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.state === 0) {
             this.$message.success("注销成功");
             window.sessionStorage.removeItem("userInfo");
             this.isLogin = false;
-            this.$router.push({ name: "homeLink" });
+            this.$router.push({ name: "homeLink" }).catch(() => {
+              window.location.reload();
+            });
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
-    }
+    },
   },
   created() {
     this.initData();
   },
   components: {
     vLogin: Login,
-    vRegister: Register
-  }
+    vRegister: Register,
+  },
 };
 </script>
 

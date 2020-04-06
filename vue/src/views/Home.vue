@@ -1,6 +1,21 @@
 <template>
   <div class="home">
     <div class="container">
+      <div class="sort">
+        <el-select v-model="sortValue" placeholder="排序规则">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+        <div class="sort_orderBy">
+          <el-radio v-model="radioValue" label="1">升序</el-radio>
+          <el-radio v-model="radioValue" label="2">降序</el-radio>
+        </div>
+      </div>
       <ul class="post-wrapper">
         <li class="post-item" v-for="(item, index) in allPost" :key="index">
           <h1 class="title">{{ item.post_title }}</h1>
@@ -8,6 +23,17 @@
           <div class="post_footer">
             <img class="avatar" :src="item.user_avatar" alt="头像" />
             <span class="userName">{{ item.user_nickName }}</span>
+            <div class="tools">
+              <span
+                class="iconfont icon-zhichi"
+                @click="toggleClass(item.post_id, item)"
+                :class="{ support: supportArr.includes(item.post_id) }"
+                >{{ item.post_praise_count }}</span
+              >
+              <span class="iconfont icon-yuedu">{{
+                item.post_read_count
+              }}</span>
+            </div>
           </div>
         </li>
       </ul>
@@ -21,40 +47,125 @@
 export default {
   data() {
     return {
-      allPost: []
+      allPost: [],
+      contentSlice: 80,
+      supportArr: [],
+      sortValue: 0, // 按照什么规则排序，默认是时间
+      options: [
+        { value: 0, label: "时间" },
+        { value: 1, label: "点赞次数" },
+        { value: 2, label: "阅读次数" },
+      ],
+      radioValue: "2", //默认是降序
     };
   },
   methods: {
-    // 初始化数据
+    // 初始化数据,obj代表的是排序规则
     initData() {
-      this.$axios({
+      return this.$axios({
         method: "post",
-        url: "/get_allPost"
+        url: "/get_allPost",
+        params: {
+          sort_rule: this.sortValue,
+          sort_orderBy: this.radioValue,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res.data.state === 0) {
             this.allPost = res.data.allPost;
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
-    // 文章内容填充
-    content() {
-      setTimeout(() => {
-        let arr = this.$refs.post_content;
-        arr.forEach((item, index) => {
-          item.innerHTML = this.allPost[index].post_content;
+
+    /**
+     * 初始化supportArr点赞
+     */
+    initSupportArr() {
+      this.$axios({
+        method: "get",
+        url: "/getSupportArr",
+      })
+        .then((res) => {
+          if (res.data.state === 0) {
+            // 为supportArr赋值
+            this.supportArr = res.data.arr;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      }, 300);
-    }
+    },
+
+    /**
+     * 文章内容填充
+     * 先把富文本编辑器的带有html标签的内容填充进去，在用innerText进行内容截取
+     */
+    content() {
+      let arr = this.$refs.post_content;
+      arr.forEach((item, index) => {
+        item.innerHTML = this.allPost[index].post_content;
+        // 先用正则把空格去掉，再进行截取长度，最后加上...当成省略
+        item.innerText =
+          item.innerText
+            .replace(new RegExp("\\s", "g"), "")
+            .slice(0, this.contentSlice) + "...";
+      });
+    },
+
+    /**
+     * 记录是否点过赞
+     * 如果点过赞则设为未赞样式，
+     * 为点过赞设为点赞样式
+     */
+    toggleClass(post_id, item) {
+      this.$axios({
+        method: "get",
+        url: "/addSupport",
+        params: {
+          post_id: post_id,
+        },
+      })
+        .then((res) => {
+          /**
+           * state为0代表取消点赞
+           * state为1代表点赞
+           * state为2代表未登录
+           */
+          switch (res.data.state) {
+            case 0:
+              this.supportArr.splice(this.supportArr.indexOf(post_id), 1);
+              item.post_praise_count--;
+              break;
+            case 1:
+              this.supportArr.push(post_id);
+              item.post_praise_count++;
+              break;
+            case 2:
+              this.$message.warning("请先登录");
+              break;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
-  created() {
-    this.initData();
+  watch: {
+    sortValue() {
+      this.initData();
+    },
+    radioValue() {
+      this.initData();
+    },
+  },
+  async created() {
+    await this.initData();
+    this.initSupportArr();
     this.content();
   },
-  components: {}
 };
 </script>
 
@@ -67,6 +178,15 @@ export default {
     background-color: $div_bgColor;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
     padding: 1rem;
+    .sort {
+      display: flex;
+      padding-bottom: 1rem;
+      justify-content: center;
+      align-items: center;
+      .sort_orderBy {
+        padding-left: 1rem;
+      }
+    }
     .post-wrapper {
       .post-item {
         padding: 0.5rem;
@@ -81,8 +201,12 @@ export default {
         .post_content {
           color: $diy_gary;
           padding-bottom: 1rem;
+          font-size: 1rem !important;
+          line-height: 1.2rem;
+          overflow: hidden;
         }
         .post_footer {
+          position: relative;
           .avatar {
             width: 1.5rem;
             border-radius: 50%;
@@ -95,12 +219,47 @@ export default {
               color: $diy_blue;
             }
           }
+          .tools {
+            display: flex;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            color: $diy_gary;
+            .icon-zhichi,
+            .icon-yuedu {
+              padding-left: 1rem;
+              &:hover {
+                color: $diy_blue;
+              }
+              &::before {
+                padding-right: 0.5rem;
+              }
+            }
+            .icon-zhichi {
+              &::after {
+                display: inline-block;
+                vertical-align: top;
+                padding-left: 1rem;
+                box-sizing: border-box;
+                content: "|";
+                font-size: 0.8rem;
+                color: $diy_gary;
+              }
+            }
+            .icon-zhichi.support {
+              color: $tb_color;
+            }
+          }
         }
         &:hover {
           cursor: pointer;
           background: rgba(0, 0, 0, 0.1);
         }
       }
+    }
+    @media screen and (max-width: 768px) {
+      width: 100%;
+      padding: 0;
     }
   }
 }

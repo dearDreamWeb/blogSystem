@@ -94,7 +94,7 @@ export default {
         name: "",
         password: "",
         confirmCode: "",
-        nowConfirmCode: ""
+        nowConfirmCode: "",
       },
       isRefresh: false,
       rules: {
@@ -102,30 +102,30 @@ export default {
           {
             required: true,
             validator: validateName,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             validator: validatePassword,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         confirmCode: [
           {
             required: true,
             validator: validateConfirmCode,
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   props: {
     loginVisible: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
   methods: {
     /**
@@ -135,43 +135,46 @@ export default {
 
     handleClose() {
       this.$confirm("关闭后数据将会清空, 是否继续?", "提示", {
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           this.$emit("changeLoginVisible", false);
           // 清空form表单的值
           this.$refs["ruleForm"].resetFields();
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     },
 
     /**
      *提交
      */
     submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$axios({
             method: "get",
             url: "/login",
             params: {
               userName: this.ruleForm.name,
-              userPassword: this.ruleForm.password
-            }
+              userPassword: this.ruleForm.password,
+            },
           })
-            .then(res => {
+            .then((res) => {
               if (res.data.state === 0) {
                 this.$message.success("登录成功");
                 this.$refs["ruleForm"].resetFields();
                 // 向vuex中传入登录成功的用户的id
-                this.$store.commit("setUserInfo",res.data.user_id);
+                this.$store.commit("setUserInfo", res.data.user_id);
                 this.$emit("userIsLogin");
                 this.$emit("changeLoginVisible", false);
+                this.$router.push({ name: "homeLink" }).catch(() => {
+                  window.location.reload();
+                });
               } else if (res.data.state === 1) {
                 this.$message.error("用户名或密码错误");
               }
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err);
             });
         } else {
@@ -183,17 +186,17 @@ export default {
     // 验证码正确的值
     nowVal(val) {
       this.ruleForm.nowConfirmCode = val;
-    }
+    },
   },
   watch: {
     // 监听loginVisible，当为true时，显示模态框时，改变isRefresh，让canvas组件刷新验证码
     loginVisible(val) {
       this.isRefresh = val;
-    }
+    },
   },
   components: {
-    vCanvas: Canvas
-  }
+    vCanvas: Canvas,
+  },
 };
 </script>
 
