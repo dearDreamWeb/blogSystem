@@ -1,28 +1,47 @@
 <template>
   <div class="home">
-    <div class="container">
-      <div class="sort">
-        <el-select v-model="sortValue" placeholder="排序规则">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-        <div class="sort_orderBy">
-          <el-radio v-model="radioValue" label="1">升序</el-radio>
-          <el-radio v-model="radioValue" label="2">降序</el-radio>
-        </div>
+    <!-- 排序规则 -->
+    <div class="sort">
+      <el-select
+        class="select-wrapper"
+        v-model="sortValue"
+        placeholder="排序规则"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        >
+        </el-option>
+      </el-select>
+      <div class="sort_orderBy">
+        <el-radio v-model="radioValue" label="1">升序</el-radio>
+        <el-radio v-model="radioValue" label="2">降序</el-radio>
       </div>
+    </div>
+    <!-- 内容区 -->
+    <div class="container">
+      <!-- 文章遍历 -->
       <ul class="post-wrapper">
         <li class="post-item" v-for="(item, index) in allPost" :key="index">
           <h1 class="title">{{ item.post_title }}</h1>
           <h2 class="post_content" ref="post_content"></h2>
+          <!-- 文章列表尾部 -->
           <div class="post_footer">
-            <img class="avatar" :src="item.user_avatar" alt="头像" />
-            <span class="userName">{{ item.user_nickName }}</span>
+            <!-- 点击作者头像或者名字跳转作者的个人中心 -->
+            <div
+              @click="
+                $router.push({
+                  name: 'aboutLink',
+                  params: { id: item.user_id },
+                })
+              "
+            >
+              <img class="avatar" :src="item.user_avatar" alt="头像" />
+              <span class="userName">{{ item.user_nickName }}</span>
+            </div>
+            <!-- 点赞和阅读 -->
             <div class="tools">
               <span
                 class="iconfont icon-zhichi"
@@ -172,24 +191,37 @@ export default {
 <style lang="scss" scoped>
 @import "../common/styles";
 .home {
+  .sort {
+    display: flex;
+    margin: 1rem auto 0;
+    padding: 1rem;
+    width: 60%;
+    justify-content: center;
+    align-items: center;
+    background: $div_bgColor;
+    box-sizing: border-box;
+    .select-wrapper {
+      width: 8rem;
+    }
+    .sort_orderBy {
+      padding-left: 1rem;
+    }
+    @media screen and (max-width: 768px) {
+      width: 100%;
+      margin: 0;
+    }
+  }
   .container {
-    margin: 0 auto;
+    margin: 1rem auto 0;
     width: 60%;
     background-color: $div_bgColor;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
     padding: 1rem;
-    .sort {
-      display: flex;
-      padding-bottom: 1rem;
-      justify-content: center;
-      align-items: center;
-      .sort_orderBy {
-        padding-left: 1rem;
-      }
-    }
+    box-sizing: border-box;
     .post-wrapper {
       .post-item {
         padding: 0.5rem;
+        border-radius: 5px;
         border-bottom: $border_bottom;
         .title {
           font-size: 1.3rem;
@@ -244,6 +276,7 @@ export default {
                 content: "|";
                 font-size: 0.8rem;
                 color: $diy_gary;
+                opacity: 0.3;
               }
             }
             .icon-zhichi.support {
@@ -253,13 +286,12 @@ export default {
         }
         &:hover {
           cursor: pointer;
-          background: rgba(0, 0, 0, 0.1);
+          background: rgba(82, 81, 81, 0.1);
         }
       }
     }
     @media screen and (max-width: 768px) {
       width: 100%;
-      padding: 0;
     }
   }
 }

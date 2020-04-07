@@ -30,7 +30,16 @@
       <!-- 弹出框，可以选择个人中心还是写文章 -->
       <el-popover placement="bottom" trigger="hover">
         <ul class="popover-content">
-          <li @click="$router.push(`/about/${userInfo.user_id}`)">个人中心</li>
+          <li
+            @click="
+              $router.push({
+                name: 'aboutLink',
+                params: { id: userInfo.user_id },
+              })
+            "
+          >
+            个人中心
+          </li>
           <li>
             <router-link :to="{ name: 'editPostLink' }">写文章</router-link>
           </li>

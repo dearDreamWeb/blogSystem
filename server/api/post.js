@@ -107,4 +107,22 @@ module.exports = (router, crud) => {
             })
         }
     });
+
+    /**
+     * 获取指定用户的文章
+     * state:0代表用户存在
+     * state:1代表用户不存在
+    */
+    router.get("/getUserPost", (req, res) => {
+        crud("SELECT * FROM `post` WHERE post_masterId = ?", [req.query.user_id], data => {
+            if (data.length > 0) {
+                res.json({
+                    state: 0,
+                    post: data
+                });
+            } else {
+                res.json({ state: 1 });
+            }
+        })
+    })
 }
