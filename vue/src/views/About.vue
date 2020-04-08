@@ -8,7 +8,7 @@
       <!-- 作者名和性别 -->
       <div class="userName">
         {{ userInfo.user_nickName }}
-        <i class="el-icon-male" v-if="userInfo.user_sex === 1"></i>
+        <i class="el-icon-male" v-if="userInfo.user_sex == 1"></i>
         <i class="el-icon-female" v-else></i>
       </div>
       <!-- 作者的基本信息 -->
@@ -40,14 +40,29 @@
 
       <!-- 编辑个人资料 -->
       <div class="editData" v-if="editDataVisible">
-        <el-button size="small" type="success" round>编辑个人资料</el-button>
+        <!-- 点击显示个人资料按钮 -->
+        <el-button
+          size="small"
+          type="success"
+          round
+          :disabled="userDataVisible"
+          @click="userDataVisible = true"
+          >编辑个人资料</el-button
+        >
       </div>
     </div>
 
     <!-- 内容区 -->
     <div class="container">
+      <!-- 引入EditData组件 -->
+      <edit-data
+        v-if="userDataVisible"
+        :data="userInfo"
+        @colseEdit="colseEdit"
+        @recoverData="recoverData"
+      ></edit-data>
       <!-- 文章遍历 -->
-      <ul class="post-wrapper">
+      <ul class="post-wrapper" v-else>
         <li class="post-item" v-for="(item, index) in postArr" :key="index">
           <h1 class="title">{{ item.post_title }}</h1>
           <h2 class="post_content" ref="post_content"></h2>
@@ -62,6 +77,9 @@
             <span class="iconfont icon-yuedu post_footer_item">{{
               item.post_read_count
             }}</span>
+            <span class="iconfont icon-pinglun post_footer_item">{{
+              item.post_comment_count
+            }}</span>
           </div>
         </li>
       </ul>
@@ -71,6 +89,7 @@
 
 <script>
 // @ is an alias to /src
+import EditData from "@/components/EditData";
 
 export default {
   data() {
@@ -80,13 +99,14 @@ export default {
       moreVisible: false,
       contentSlice: 80,
       supportArr: [],
-      editDataVisible: false, //编辑个人资料是否显示
+      editDataVisible: false, //编辑个人资料按钮是否显示
+      userDataVisible: false, //个人资料是否显示
     };
   },
   methods: {
-    // 初始化数据
-    initData(user_id) {
-      return Promise.all([
+    // 初始化数据 用await等待数据加载完之后再加载文章内容
+    async initData(user_id) {
+      await Promise.all([
         this.initData_post(user_id),
         this.initData_userInfo(user_id),
       ])
@@ -104,15 +124,20 @@ export default {
           if (values[1].data.state === 0) {
             this.userInfo = values[1].data.userInfo;
             // 获取vuex中的用户信息，看个人中心是不是该用户的，是的话，显示编辑个人资料；不是的话则不显示
-            let store_userId = this.$store.getters.getUserInfo.userInfo.user_id;
-            this.userInfo.user_id === store_userId
-              ? (this.editDataVisible = true)
-              : (this.editDataVisible = false);
+            let store_userInfo = this.$store.getters.getUserInfo.userInfo;
+            if (store_userInfo) {
+              this.userInfo.user_id === store_userInfo.user_id
+                ? (this.editDataVisible = true)
+                : (this.editDataVisible = false);
+            }
           }
         })
         .catch((err) => {
           console.log(err);
         });
+
+      // 加载文章内容
+      this.content();
     },
     // 初始化指定用户的文章
     initData_post(user_id) {
@@ -156,6 +181,13 @@ export default {
             .slice(0, this.contentSlice) + "...";
       });
     },
+    /**
+     * 编辑组件传来的自定义事件，提醒关闭编辑个人资料界面
+     */
+    colseEdit() {
+      this.userDataVisible = false;
+      this.initData(this.$route.params.id);
+    }
   },
   filters: {
     // 由于从mysql数据库导过来的时间格式改变成了2020-04-01T14:59:33.000Z，所以需要过滤一下
@@ -163,12 +195,13 @@ export default {
       return new Date(val).toLocaleString().replace(new RegExp("/", "g"), "-");
     },
   },
-  async created() {
+  created() {
     // 把动态路由传的参数id给initPost，获取用户文章
-    await this.initData(this.$route.params.id);
-    this.content();
+    this.initData(this.$route.params.id);
   },
-  components: {},
+  components: {
+    EditData,
+  },
 };
 </script>
 
@@ -289,8 +322,7 @@ export default {
             &::before {
               padding-right: 0.3rem;
             }
-            &:nth-child(1),
-            &:nth-child(2) {
+            &:nth-child(n) {
               &::after {
                 display: inline-block;
                 vertical-align: top;
@@ -300,6 +332,11 @@ export default {
                 font-size: 0.8rem;
                 color: $diy_gary;
                 opacity: 0.3;
+              }
+            }
+            &:last-child {
+              &::after {
+                display: none;
               }
             }
           }

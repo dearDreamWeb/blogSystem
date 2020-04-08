@@ -59,7 +59,7 @@ module.exports = (router, crud) => {
      * 获取用户信息
      * state:0代表用户存在
      * state:1代表用户不存在
-     * */ 
+     * */
     router.get("/getUserInfo", (req, res) => {
         crud("SELECT * FROM `users` WHERE user_id = ?", [req.query.user_id], data => {
             if (data.length > 0) {
@@ -79,5 +79,17 @@ module.exports = (router, crud) => {
         req.session.destroy(() => {
             res.json({ state: 0 });
         });
+    })
+
+    /**
+     * 修改用户信息
+    */
+    router.post("/updateUserData", (req, res) => {
+        let data = req.body.data;
+        let arrData = [data.user_password, data.user_sex, data.user_nickName, data.user_avatar, data.user_email, data.user_birthday, data.user_address, data.user_id];
+        crud("UPDATE `users` SET user_password=?, user_sex=?, user_nickName=?, user_avatar=?, user_email=?, user_birthday=?, user_address=? WHERE user_id =?",
+            arrData, () => {
+                res.json({ state: 0 });
+            })
     })
 }
