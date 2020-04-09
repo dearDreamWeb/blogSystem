@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import About from "../views/About.vue";
 import EditPost from "../views/EditPost.vue";
 import Error from "../views/404.vue";
+import Post from "../views/Post.vue";
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,11 @@ const routes = [
     path: "/editPost",
     name: "editPostLink",
     component: EditPost
+  },
+  {
+    path: "/post/:post_id",
+    name: "postLink",
+    component: Post
   },
   {
     path: "*",

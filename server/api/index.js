@@ -18,6 +18,9 @@ module.exports = (app, express) => {
 
     // 文章管理
     require("./post")(router, crud);
+    
+    // 评论管理
+    require("./comment")(router, crud);
 
     // 静态文件托管 保存头像
     app.use(express.static("../upload/avatar"));

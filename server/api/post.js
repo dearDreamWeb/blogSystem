@@ -55,6 +55,27 @@ module.exports = (router, crud) => {
             });
     });
 
+
+    /**
+     * 获取指定的文章
+     * 并更新阅读数量
+     */
+    router.get("/get_post", (req, res) => {
+        crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_id = ?", [req.query.post_id], data => {
+            if (data.length > 0) {
+                crud("UPDATE `post` SET post_read_count = post_read_count + 1 WHERE post_id =?", [req.query.post_id], () => {
+                    res.json({
+                        state: 0,
+                        postData: data[0]
+                    });
+                })
+            } else {
+                res.json({ state: 1 });
+            }
+        })
+    })
+
+
     /**
      * 对文章点赞
      * state为0代表取消点赞

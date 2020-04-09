@@ -25,7 +25,18 @@
       <!-- 文章遍历 -->
       <ul class="post-wrapper">
         <li class="post-item" v-for="(item, index) in allPost" :key="index">
-          <h1 class="title">{{ item.post_title }}</h1>
+          <!-- 点击跳转到文章内容post界面 -->
+          <h1
+            class="title"
+            @click="
+              $router.push({
+                name: 'postLink',
+                params: { post_id: item.post_id },
+              })
+            "
+          >
+            {{ item.post_title }}
+          </h1>
           <h2 class="post_content" ref="post_content"></h2>
           <!-- 文章列表尾部 -->
           <div class="post_footer">
@@ -49,9 +60,17 @@
                 :class="{ support: supportArr.includes(item.post_id) }"
                 >{{ item.post_praise_count }}</span
               >
-              <span class="iconfont icon-yuedu">{{
-                item.post_read_count
-              }}</span>
+              <!-- 点击跳转到文章内容post界面 -->
+              <span
+                class="iconfont icon-yuedu"
+                @click="
+                  $router.push({
+                    name: 'postLink',
+                    params: { post_id: item.post_id },
+                  })
+                "
+                >{{ item.post_read_count }}</span
+              >
             </div>
           </div>
         </li>

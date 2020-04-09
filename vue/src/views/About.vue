@@ -63,7 +63,18 @@
       ></edit-data>
       <!-- 文章遍历 -->
       <ul class="post-wrapper" v-else>
-        <li class="post-item" v-for="(item, index) in postArr" :key="index">
+        <!-- 点击跳转到文章内容post界面 -->
+        <li
+          class="post-item"
+          v-for="(item, index) in postArr"
+          :key="index"
+          @click="
+            $router.push({
+              name: 'postLink',
+              params: { post_id: item.post_id },
+            })
+          "
+        >
           <h1 class="title">{{ item.post_title }}</h1>
           <h2 class="post_content" ref="post_content"></h2>
           <div class="post_footer">
@@ -187,7 +198,7 @@ export default {
     colseEdit() {
       this.userDataVisible = false;
       this.initData(this.$route.params.id);
-    }
+    },
   },
   filters: {
     // 由于从mysql数据库导过来的时间格式改变成了2020-04-01T14:59:33.000Z，所以需要过滤一下
@@ -209,13 +220,11 @@ export default {
 @import "../common/styles";
 .about {
   .header {
-    margin: 1rem auto 0;
-    padding-bottom: 1rem;
-    width: 60%;
-    background-color: $div_bgColor;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    @include content_style;
+    padding: 0 0 1rem 0;
     background: url("./../assets/poster.jpg") no-repeat;
-    background-size: 100% 100%;
+    background-size: cover;
+    background-position: 50% 50%;
     .avatar-wrapper {
       padding: 2rem 0 1rem;
       text-align: center;
@@ -257,7 +266,7 @@ export default {
       font-size: 1rem;
       color: $diy_gary;
       background: $div_bgColor;
-      border-radius: 5px;
+      border-radius: 3px;
       .info-item {
         line-height: 1.3rem;
         box-sizing: border-box;
@@ -287,12 +296,7 @@ export default {
     }
   }
   .container {
-    margin: 1rem auto 0;
-    width: 60%;
-    background-color: $div_bgColor;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-    padding: 1rem;
-    box-sizing: border-box;
+    @include content_style;
     .post-wrapper {
       // 文章样式
       .post-item {
@@ -315,13 +319,15 @@ export default {
         }
         // 时间，点赞和阅读量的样式
         .post_footer {
-          color: $diy_gary;
+          color: $diy_blue;
           font-size: 0.8rem;
           .post_footer_item {
             padding-right: 1rem;
             &::before {
               padding-right: 0.3rem;
+              color: $diy_gary;
             }
+            // 分隔杠
             &:nth-child(n) {
               &::after {
                 display: inline-block;
@@ -346,15 +352,6 @@ export default {
           background: rgba(82, 81, 81, 0.1);
         }
       }
-    }
-  }
-  @media screen and (max-width: 768px) {
-    .header {
-      width: 100%;
-      margin: 0;
-    }
-    .container {
-      width: 100%;
     }
   }
 }
