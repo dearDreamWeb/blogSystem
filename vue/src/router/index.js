@@ -15,6 +15,11 @@ const routes = [
     component: Home
   },
   {
+    path: "/search/:content",
+    name: "searchLink",
+    component: Home
+  },
+  {
     path: "/about/:id",
     name: "aboutLink",
     component: About

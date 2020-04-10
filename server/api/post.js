@@ -27,6 +27,7 @@ module.exports = (router, crud) => {
      * 获取所有文章
      * req.query.sort_rule 为1正序，为2倒序
      * req.query.sort_orderBy 为0按时间排序，为1点赞量排序，为2阅读量排序
+     * 当req.query.search_content不为undefined时说明是要模糊查询内容，用户从搜索框里搜索的
      */
     router.post("/get_allPost", (req, res) => {
         let sort_orderBy = req.query.sort_orderBy === "1" ? "ASC" : "DESC";
@@ -46,13 +47,26 @@ module.exports = (router, crud) => {
                 sort_rule = "post_createTime"
                 break;
         }
-        crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
-            data => {
-                res.json({
-                    state: 0,
-                    allPost: data
+        // 模糊查询文章标题或者文章内容
+        if (req.query.search_content) {
+            crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_content LIKE '%" + req.query.search_content + "%' OR post_title LIKE '%" + req.query.search_content + "%'  ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
+                data => {
+                    res.json({
+                        state: 0,
+                        allPost: data
+                    });
                 });
-            });
+        } else {
+            // 所有的文章
+            crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
+                data => {
+                    res.json({
+                        state: 0,
+                        allPost: data
+                    });
+                });
+        }
+
     });
 
 

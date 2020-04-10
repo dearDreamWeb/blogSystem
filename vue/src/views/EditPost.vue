@@ -28,12 +28,16 @@
         <el-button type="danger" plain @click="submit">发布文章</el-button>
       </div>
     </div>
+    <!-- 回到顶部 -->
+    <back-top></back-top>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import E from "wangeditor";
+import BackTop from "@/components/BackTop";
+
 export default {
   data() {
     return {
@@ -41,7 +45,7 @@ export default {
       editorContent: "",
       title: "",
       title_maxLength: 30, //文章标题最大长度
-      countTitle: "" //显示标题剩余的字数
+      countTitle: "", //显示标题剩余的字数
     };
   },
   methods: {
@@ -52,7 +56,7 @@ export default {
       this.editor = new E(this.$refs.editorElem);
       this.editor.customConfig.uploadImgShowBase64 = true; // 使用 base64 保存图片
       // 编辑器的事件，每次改变会获取其html内容
-      this.editor.customConfig.onchange = html => {
+      this.editor.customConfig.onchange = (html) => {
         this.editorContent = html;
         this.catchData(this.editorContent); // 把这个html通过catchData的方法传入父组件
       };
@@ -76,7 +80,7 @@ export default {
         "table", // 表格
         // "code", // 插入代码
         "undo", // 撤销
-        "redo" // 重复
+        "redo", // 重复
       ];
       this.editor.create(); // 创建富文本实例
     },
@@ -95,10 +99,10 @@ export default {
               url: "/setPost",
               data: {
                 title: this.title,
-                content: this.editorContent
-              }
+                content: this.editorContent,
+              },
             })
-              .then(res => {
+              .then((res) => {
                 if (res.data.state === 0) {
                   this.$message.success("发布成功");
                   this.title = "";
@@ -106,7 +110,7 @@ export default {
                   document.querySelector(".w-e-text").innerHTML = "";
                 }
               })
-              .catch(err => {
+              .catch((err) => {
                 console.log(err);
               });
           })
@@ -130,10 +134,10 @@ export default {
       document.querySelector(".w-e-text-container").style.zIndex = "0";
       // 修改工具栏中所有工具的z-index
       let arr = Array.from(document.querySelectorAll(".w-e-menu"));
-      arr.forEach(item => {
+      arr.forEach((item) => {
         item.style.zIndex = "1";
       });
-    }
+    },
   },
   watch: {
     // 计算限制的字数剩余多少，并给countTitle赋值
@@ -145,7 +149,7 @@ export default {
         this.title = this.title.slice(0, this.title_maxLength);
         this.$message.warning("文章标题超过最大长度");
       }
-    }
+    },
   },
   mounted() {
     this.initWangEditor();
@@ -153,14 +157,17 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     // 如果未登录返回首页，提示用户登录
-    next(vm => {
+    next((vm) => {
       let isLogin = vm.$store.getters.getUserInfo.userInfo;
       isLogin
         ? true
         : vm.$router.push({ name: "homeLink" }) &&
           vm.$message.warning("请先登录");
     });
-  }
+  },
+  components: {
+    BackTop,
+  },
 };
 </script>
 

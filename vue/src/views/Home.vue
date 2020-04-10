@@ -23,7 +23,7 @@
     <!-- 内容区 -->
     <div class="container">
       <!-- 文章遍历 -->
-      <ul class="post-wrapper">
+      <ul class="post-wrapper" v-if="allPost.length > 0">
         <li class="post-item" v-for="(item, index) in allPost" :key="index">
           <!-- 点击跳转到文章内容post界面 -->
           <h1
@@ -75,12 +75,17 @@
           </div>
         </li>
       </ul>
+      <div class="noPost" v-else>暂无数据</div>
     </div>
+
+    <!-- 回到顶部 -->
+    <back-top></back-top>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
+import BackTop from "@/components/BackTop";
 
 export default {
   data() {
@@ -99,13 +104,14 @@ export default {
   },
   methods: {
     // 初始化数据,obj代表的是排序规则
-    initData() {
+    initData(searchContent) {
       return this.$axios({
         method: "post",
         url: "/get_allPost",
         params: {
           sort_rule: this.sortValue,
           sort_orderBy: this.radioValue,
+          search_content: searchContent,
         },
       })
         .then((res) => {
@@ -138,19 +144,22 @@ export default {
     },
 
     /**
+     * 先判断是否有文章，没有就不运行了
      * 文章内容填充
      * 先把富文本编辑器的带有html标签的内容填充进去，在用innerText进行内容截取
      */
     content() {
-      let arr = this.$refs.post_content;
-      arr.forEach((item, index) => {
-        item.innerHTML = this.allPost[index].post_content;
-        // 先用正则把空格去掉，再进行截取长度，最后加上...当成省略
-        item.innerText =
-          item.innerText
-            .replace(new RegExp("\\s", "g"), "")
-            .slice(0, this.contentSlice) + "...";
-      });
+      if (this.allPost.length > 0) {
+        let arr = this.$refs.post_content;
+        arr.forEach((item, index) => {
+          item.innerHTML = this.allPost[index].post_content;
+          // 先用正则把空格去掉，再进行截取长度，最后加上...当成省略
+          item.innerText =
+            item.innerText
+              .replace(new RegExp("\\s", "g"), "")
+              .slice(0, this.contentSlice) + "...";
+        });
+      }
     },
 
     /**
@@ -193,16 +202,20 @@ export default {
   },
   watch: {
     sortValue() {
-      this.initData();
+      this.initData(this.$route.params.content);
     },
     radioValue() {
-      this.initData();
+      this.initData(this.$route.params.content);
     },
   },
   async created() {
-    await this.initData();
+    await this.initData(this.$route.params.content);
     this.initSupportArr();
     this.content();
+    console.log();
+  },
+  components: {
+    BackTop,
   },
 };
 </script>
@@ -260,6 +273,7 @@ export default {
           position: relative;
           .avatar {
             width: 1.5rem;
+            height: 1.5rem;
             border-radius: 50%;
           }
           .userName {

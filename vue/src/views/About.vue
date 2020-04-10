@@ -63,7 +63,7 @@
 
       <!-- 文章遍历 -->
       <div v-else>
-        <ul class="post-wrapper" >
+        <ul class="post-wrapper">
           <!-- 点击跳转到文章内容post界面 -->
           <li
             class="post-item"
@@ -96,15 +96,21 @@
           </li>
         </ul>
         <!-- 没有文章的话显示 -->
-        <div class="noPost" v-show="postArr.length == 0">作者很懒，没发布过文章。</div>
+        <div class="noPost" v-show="postArr.length == 0">
+          作者很懒，没发布过文章。
+        </div>
       </div>
     </div>
+
+    <!-- 回到顶部 -->
+    <back-top></back-top>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import EditData from "@/components/EditData";
+import BackTop from "@/components/BackTop";
 
 export default {
   data() {
@@ -153,8 +159,6 @@ export default {
 
       // 加载文章内容
       this.content();
-      console.log(this.postArr);
-      console.log(this.userInfo);
     },
     // 初始化指定用户的文章
     initData_post(user_id) {
@@ -218,6 +222,7 @@ export default {
   },
   components: {
     EditData,
+    BackTop,
   },
 };
 </script>
@@ -359,7 +364,7 @@ export default {
         }
       }
     }
-    .noPost{
+    .noPost {
       font-size: 2rem;
       color: $diy_gary;
     }

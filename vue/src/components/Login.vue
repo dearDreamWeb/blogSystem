@@ -24,7 +24,10 @@
 
         <el-form-item label="验证码" prop="confirmCode">
           <v-canvas @nowVal="nowVal" :isRefresh="isRefresh"></v-canvas>
-          <el-input v-model="ruleForm.confirmCode"></el-input>
+          <el-input
+            v-model="ruleForm.confirmCode"
+            @keydown.enter.native="submitForm('ruleForm')"
+          ></el-input>
         </el-form-item>
 
         <el-form-item>

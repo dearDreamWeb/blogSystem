@@ -1,6 +1,6 @@
 <template>
   <div class="post">
-    <div class="container">
+    <div class="container" ref="container">
       <!-- 头部 -->
       <div class="post_header">
         <div class="title">{{ postData.post_title }}</div>
@@ -47,11 +47,15 @@
     </div>
     <!-- 评论 -->
     <v-comment :postData="postData"></v-comment>
+
+    <!-- 回到顶部 -->
+    <back-top></back-top>
   </div>
 </template>
 
 <script>
 import Comment from "@/components/Comment";
+import BackTop from "@/components/BackTop";
 
 export default {
   data() {
@@ -146,10 +150,15 @@ export default {
     },
     /**
      * 文章内容填充
+     * 并设置图片的大小最大为container的宽度，防止图片超出容器
      */
     content() {
       let wrapper = this.$refs.post_content;
       wrapper.innerHTML = this.postData.post_content;
+      let imgArr = Array.from(document.querySelectorAll("img"));
+      imgArr.forEach(item => {
+        item.style.maxWidth = window.getComputedStyle(this.$refs.container).width;
+      })
     },
   },
   created() {
@@ -163,6 +172,7 @@ export default {
   },
   components: {
     vComment: Comment,
+    BackTop,
   },
 };
 </script>
@@ -172,6 +182,7 @@ export default {
 .post {
   .container {
     @include content_style;
+    overflow-x: hidden;
     //   头部
     .post_header {
       border-bottom: $border_bottom;

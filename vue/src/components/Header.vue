@@ -12,11 +12,12 @@
       <el-input
         type="text"
         class="search"
-        placeholder="搜索文章标题"
+        placeholder="搜索文章标题或内容"
         v-model="searchVal"
         clearable
+        @keydown.enter.native="searchPost"
       ></el-input>
-      <el-button type="primary" class="search-btn"
+      <el-button type="primary" class="search-btn" @click="searchPost"
         ><i class="el-icon-search"></i>
         <!-- 小屏幕的时候隐藏 -->
         <span class="hidden-xs-only">搜索</span></el-button
@@ -162,6 +163,20 @@ export default {
       this.$router.push({
         name: "aboutLink",
         params: { id: this.userInfo.user_id },
+      });
+      this.reload();
+    },
+
+    /**
+     * 跳转到home界面
+     * 搜索文章标题或者内容
+     */
+    searchPost() {
+      this.$router.push({
+        name: "searchLink",
+        params: {
+          content: this.searchVal,
+        },
       });
       this.reload();
     },
