@@ -59,41 +59,45 @@
         v-if="userDataVisible"
         :data="userInfo"
         @colseEdit="colseEdit"
-        @recoverData="recoverData"
       ></edit-data>
+
       <!-- 文章遍历 -->
-      <ul class="post-wrapper" v-else>
-        <!-- 点击跳转到文章内容post界面 -->
-        <li
-          class="post-item"
-          v-for="(item, index) in postArr"
-          :key="index"
-          @click="
-            $router.push({
-              name: 'postLink',
-              params: { post_id: item.post_id },
-            })
-          "
-        >
-          <h1 class="title">{{ item.post_title }}</h1>
-          <h2 class="post_content" ref="post_content"></h2>
-          <div class="post_footer">
-            <!-- 过滤一下时间格式 -->
-            <span class="create_time post_footer_item">{{
-              item.post_createTime | changeTime
-            }}</span>
-            <span class="iconfont icon-zhichi post_footer_item">{{
-              item.post_praise_count
-            }}</span>
-            <span class="iconfont icon-yuedu post_footer_item">{{
-              item.post_read_count
-            }}</span>
-            <span class="iconfont icon-pinglun post_footer_item">{{
-              item.post_comment_count
-            }}</span>
-          </div>
-        </li>
-      </ul>
+      <div v-else>
+        <ul class="post-wrapper" >
+          <!-- 点击跳转到文章内容post界面 -->
+          <li
+            class="post-item"
+            v-for="(item, index) in postArr"
+            :key="index"
+            @click="
+              $router.push({
+                name: 'postLink',
+                params: { post_id: item.post_id },
+              })
+            "
+          >
+            <h1 class="title">{{ item.post_title }}</h1>
+            <h2 class="post_content" ref="post_content"></h2>
+            <div class="post_footer">
+              <!-- 过滤一下时间格式 -->
+              <span class="create_time post_footer_item">{{
+                item.post_createTime | changeTime
+              }}</span>
+              <span class="iconfont icon-zhichi post_footer_item">{{
+                item.post_praise_count
+              }}</span>
+              <span class="iconfont icon-yuedu post_footer_item">{{
+                item.post_read_count
+              }}</span>
+              <span class="iconfont icon-pinglun post_footer_item">{{
+                item.post_comment_count
+              }}</span>
+            </div>
+          </li>
+        </ul>
+        <!-- 没有文章的话显示 -->
+        <div class="noPost" v-show="postArr.length == 0">作者很懒，没发布过文章。</div>
+      </div>
     </div>
   </div>
 </template>
@@ -149,6 +153,8 @@ export default {
 
       // 加载文章内容
       this.content();
+      console.log(this.postArr);
+      console.log(this.userInfo);
     },
     // 初始化指定用户的文章
     initData_post(user_id) {
@@ -352,6 +358,10 @@ export default {
           background: rgba(82, 81, 81, 0.1);
         }
       }
+    }
+    .noPost{
+      font-size: 2rem;
+      color: $diy_gary;
     }
   }
 }

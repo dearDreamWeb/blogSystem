@@ -30,14 +30,7 @@
       <!-- 弹出框，可以选择个人中心还是写文章 -->
       <el-popover placement="bottom" trigger="hover">
         <ul class="popover-content">
-          <li
-            @click="
-              $router.push({
-                name: 'aboutLink',
-                params: { id: userInfo.user_id },
-              })
-            "
-          >
+          <li @click="jumpAbout">
             个人中心
           </li>
           <li>
@@ -80,6 +73,7 @@ import Register from "./Register";
 
 export default {
   name: "Header",
+  inject: ["reload"], //刷新页面
   data() {
     return {
       searchVal: "",
@@ -152,13 +146,24 @@ export default {
             window.sessionStorage.removeItem("userInfo");
             this.isLogin = false;
             this.$router.push({ name: "homeLink" }).catch(() => {
-              window.location.reload();
+              this.reload();
             });
           }
         })
         .catch((err) => {
           console.log(err);
         });
+    },
+
+    /**
+     * 跳转到个人中心
+     */
+    jumpAbout() {
+      this.$router.push({
+        name: "aboutLink",
+        params: { id: this.userInfo.user_id },
+      });
+      this.reload();
     },
   },
   created() {

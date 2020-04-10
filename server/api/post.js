@@ -135,12 +135,14 @@ module.exports = (router, crud) => {
      * state:1代表用户不存在
     */
     router.get("/getUserPost", (req, res) => {
-        crud("SELECT * FROM `post` WHERE post_masterId = ?", [req.query.user_id], data => {
+        crud("SELECT * FROM `users` WHERE user_id =?", [req.query.user_id], data => {
             if (data.length > 0) {
-                res.json({
-                    state: 0,
-                    post: data
-                });
+                crud("SELECT * FROM `post` WHERE post_masterId = ?", [req.query.user_id], data1 => {
+                    res.json({
+                        state: 0,
+                        post: data1
+                    });
+                })
             } else {
                 res.json({ state: 1 });
             }

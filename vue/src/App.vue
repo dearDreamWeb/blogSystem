@@ -2,22 +2,34 @@
   <div id="app">
     <!-- 头部 -->
     <v-header></v-header>
-    <router-view></router-view>
+    <router-view v-if="isReload"></router-view>
   </div>
 </template>
 
 <script>
 import Header from "./components/Header";
 export default {
-  methods: {
-    init() {}
+  data() {
+    return {
+      isReload: true,
+    };
   },
-  created() {
-    this.init();
+  provide() {
+    return {
+      reload: this.reload,
+    };
+  },
+  methods: {
+    reload() {
+      this.isReload = false;
+      this.$nextTick(() => {
+        this.isReload = true;
+      });
+    },
   },
   components: {
-    vHeader: Header
-  }
+    vHeader: Header,
+  },
 };
 </script>
 
