@@ -18,29 +18,29 @@
 
 
 ### 主界面
-![主界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/1.png)
+![主界面](https://s1.ax1x.com/2020/07/10/Uurpid.png)
 
 ### 个人中心
-![个人中心](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/2.png)
+![个人中心](https://s1.ax1x.com/2020/07/10/UuDxde.png)
 
 ### 移动端主界面
-![移动端主界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/8.png)
+![移动端主界面](https://s1.ax1x.com/2020/07/10/Uur9JA.png)
 
 ### 移动端个人中心界面
-![移动端个人中心界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/9.png)
+![移动端个人中心界面](https://s1.ax1x.com/2020/07/10/UurPzt.png)
 
 ### 文章界面
-![文章界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/3.png)
+![文章界面](https://s1.ax1x.com/2020/07/10/UuDvZD.png)
 
 ### 文章界面底部的评论区
-![文章界面底部的评论区](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/4.png)
+![文章界面底部的评论区](https://s1.ax1x.com/2020/07/10/UuDXqO.png)
 
 ### 用户发布文章界面
-![用户发布文章界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/5.png)
+![用户发布文章界面](https://s1.ax1x.com/2020/07/10/UuDOsK.png)
 
 ### 注册界面
-![注册界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/6.png)
+![注册界面](https://s1.ax1x.com/2020/07/10/UuDzIH.png)
 
 ### 登录界面
-![登录界面](https://github.com/dearDreamWeb/blogSystem/blob/master/upload/images/7.png)
+![登录界面](https://s1.ax1x.com/2020/07/10/UurCRI.png)
 
