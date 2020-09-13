@@ -38,9 +38,7 @@
         </li>
       </ul>
     </div>
-    <div class="noData" v-else>
-      暂无评论
-    </div>
+    <div class="noData" v-else>暂无评论</div>
   </div>
 </template>
 
@@ -80,12 +78,12 @@ export default {
             user_id,
           },
         })
-          .then((res) => {
+          .then(res => {
             if (res.data.state === 0) {
               this.userInfo = res.data.userInfo;
             }
           })
-          .catch((err) => {
+          .catch(err => {
             console.log(err);
           });
       }
@@ -100,12 +98,12 @@ export default {
           post_id: this.$route.params.post_id,
         },
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             this.commentArr = res.data.commentData;
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -120,7 +118,7 @@ export default {
           post_id: this.$route.params.post_id,
         },
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             this.commentArr.unshift(res.data.commentData);
             this.$message.success("发表评论成功");
@@ -129,7 +127,7 @@ export default {
             this.$message.warning("请先登录");
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -155,7 +153,7 @@ export default {
       let minutes = Math.floor(timeValue / (60 * 1000));
       let seconds = Math.floor(timeValue / 1000);
       let arr = [years, months, days, hours, minutes, seconds];
-      let arr1 = ["年前", "月前", "天前", "小时前", "分钟前", "秒前","刚刚"];
+      let arr1 = ["年前", "月前", "天前", "小时前", "分钟前", "秒前", "刚刚"];
       let index = 6;
       let over = true;
       // 遍历arr，判断哪一项不为0就用over=false进行停止index的赋值操作
@@ -166,7 +164,11 @@ export default {
           over = false;
         }
       });
-      return `${arr[index]}${arr1[index]}`;
+      if (index === 6) {
+        return `${arr1[index]}`;
+      } else {
+        return `${arr[index]}${arr1[index]}`;
+      }
     },
   },
   created() {
