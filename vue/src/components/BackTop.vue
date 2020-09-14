@@ -11,7 +11,7 @@
         color: #1989fa;
       }"
     >
-      UP
+      <i class="el-icon-caret-top"></i>
     </div>
   </el-backtop>
 </template>

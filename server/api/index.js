@@ -6,7 +6,6 @@ module.exports = (app, express) => {
     const router = express.Router();
     app.use("/api", router);
 
-
     // 使用插入到接口
     const crud = require("../crud");
 
@@ -18,9 +17,12 @@ module.exports = (app, express) => {
 
     // 文章管理
     require("./post")(router, crud);
-    
+
     // 评论管理
     require("./comment")(router, crud);
+
+    // 后台系统
+    require("./admin")(router, crud);
 
     // 静态文件托管 保存头像
     app.use(express.static("../upload/avatar"));

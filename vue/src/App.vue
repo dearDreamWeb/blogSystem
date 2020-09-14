@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <!-- 头部 -->
-    <v-header></v-header>
-    <router-view v-if="isReload"></router-view>
+    <v-header v-if="showHeader"></v-header>
+    <router-view v-if="isReload" @isShowHeader="isShowHeader"></router-view>
   </div>
 </template>
 
@@ -12,6 +12,7 @@ export default {
   data() {
     return {
       isReload: true,
+      showHeader: true,
     };
   },
   provide() {
@@ -25,6 +26,10 @@ export default {
       this.$nextTick(() => {
         this.isReload = true;
       });
+    },
+    // 子组件传值，是否隐藏header
+    isShowHeader(data) {
+      this.showHeader = data;
     },
   },
   components: {
