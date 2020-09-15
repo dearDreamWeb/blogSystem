@@ -2,7 +2,7 @@
   <div id="app">
     <!-- 头部 -->
     <v-header v-if="showHeader"></v-header>
-    <router-view v-if="isReload" @isShowHeader="isShowHeader"></router-view>
+    <router-view v-if="isReload"></router-view>
   </div>
 </template>
 
@@ -27,9 +27,14 @@ export default {
         this.isReload = true;
       });
     },
-    // 子组件传值，是否隐藏header
-    isShowHeader(data) {
-      this.showHeader = data;
+  },
+  watch: {
+    $route(to) {
+      if (to.path === "/admin" || to.path === "/admin_login") {
+        this.showHeader = false;
+      } else {
+        this.showHeader = true;
+      }
     },
   },
   components: {

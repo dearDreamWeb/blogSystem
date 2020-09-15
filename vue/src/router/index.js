@@ -6,6 +6,7 @@ const EditPost = () => import("@/views/EditPost.vue");
 const Error = () => import("@/views/404.vue");
 const Post = () => import("@/views/Post.vue");
 const AdminLogin = () => import("@/views/AdminLogin.vue");
+const Admin = () => import("@/views/Admin.vue");
 
 
 Vue.use(VueRouter);
@@ -45,6 +46,15 @@ const routes = [
     path: "/admin_login",
     name: "adminLogin",
     component: AdminLogin
+  },
+  // 后台管理界面
+  {
+    path: "/admin",
+    name: "admin",
+    component: Admin,
+    children:[{
+      path:"/home"
+    }]
   },
   // 404
   {

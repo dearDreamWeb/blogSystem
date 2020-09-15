@@ -2,7 +2,7 @@
   <div class="admin_login">
     <div class="container_login">
       <div class="left">
-        <img src="../assets/admin_login.png" alt="管理员图标" />
+        <img src="../assets/images/admin_login.png" alt="管理员图标" />
       </div>
       <div class="right">
         <h1 class="title">管理员登录</h1>
@@ -31,6 +31,7 @@
               autocomplete="off"
               prefix-icon="el-icon-s-tools"
               placeholder="请输入管理员密码"
+              @keydown.enter.native="submitForm('ruleForm')"
             ></el-input>
           </el-form-item>
           <!-- 提交按钮 -->
@@ -80,26 +81,26 @@ export default {
     };
   },
   methods: {
-    //  向父组件传值，隐藏父组件头部
-    hideHeader() {
-      this.$emit("isShowHeader", false);
-    },
 
     // 表单提交
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          console.log(this.ruleForm);
           this.$axios({
             method: "post",
-            url:"/admin_login",
+            url: "/admin_login",
             data: {
               username: this.ruleForm.username,
               password: this.ruleForm.pass,
             },
           })
             .then(res => {
-              console.log(res);
+              if (res.data.status === 0) {
+                this.$message.success(res.data.message);
+                this.$router.push("/admin")
+              } else {
+                this.$message.warning(res.data.message);
+              }
             })
             .catch(err => console.log(err));
         } else {
@@ -108,9 +109,6 @@ export default {
         }
       });
     },
-  },
-  mounted() {
-    this.hideHeader();
   },
 };
 </script>
@@ -160,6 +158,7 @@ export default {
       width: 100%;
       height: 100%;
       border-radius: 0;
+      background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);
       .left {
         text-align: center;
         padding-bottom: 20px;

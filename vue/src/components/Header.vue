@@ -3,7 +3,7 @@
     <!-- logog -->
     <el-col :xs="4" :sm="8" class="logo-wrapper">
       <router-link :to="{ name: 'homeLink' }">
-        <img src="../assets/logo.svg" class="logo" />
+        <img src="../assets/images/logo.png" class="logo" />
       </router-link>
     </el-col>
 
@@ -120,12 +120,12 @@ export default {
           user_id,
         },
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             this.userInfo = res.data.userInfo;
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -141,7 +141,7 @@ export default {
         method: "get",
         url: "/loginOut",
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             this.$message.success("注销成功");
             window.sessionStorage.removeItem("userInfo");
@@ -151,7 +151,7 @@ export default {
             });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -196,10 +196,16 @@ export default {
 @import "../common/styles";
 .header {
   width: 100%;
+  height: 60px;
   padding: 0.5rem 2rem;
   background-color: $div_bgColor;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-
+  .logo-wrapper {
+    height: 100%;
+    .logo {
+      height: 100%;
+    }
+  }
   .search-wrapper {
     display: flex;
     .search-btn {

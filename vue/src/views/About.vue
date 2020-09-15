@@ -233,7 +233,7 @@ export default {
   .header {
     @include content_style;
     padding: 0 0 1rem 0;
-    background: url("./../assets/poster.jpg") no-repeat;
+    background: url("./../assets/images/poster.jpg") no-repeat;
     background-size: cover;
     background-position: 50% 50%;
     .avatar-wrapper {
