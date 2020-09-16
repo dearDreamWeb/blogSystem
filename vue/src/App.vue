@@ -29,8 +29,11 @@ export default {
     },
   },
   watch: {
+    // 监听陆游的变化
     $route(to) {
-      if (to.path === "/admin" || to.path === "/admin_login") {
+      // 匹配/admin或者/admin/或者/admin/....路径
+      let reg = /^\/admin|^\/admin[\/|\/\S+]/;
+      if (reg.test(to.path)) {
         this.showHeader = false;
       } else {
         this.showHeader = true;

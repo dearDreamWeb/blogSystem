@@ -52,9 +52,28 @@ const routes = [
     path: "/admin",
     name: "admin",
     component: Admin,
-    children:[{
-      path:"/home"
-    }]
+    redirect: "/admin/home",
+    children: [
+      {
+        path: "home",
+        name: "adminHome",
+        component: Admin,
+      },
+      {
+        path: "post_lists",
+        name: "adminPostLists",
+        component: Admin,
+      },
+      {
+        path: "users",
+        name: "users",
+        component: Admin,
+      },
+      {
+        path: "admin_users",
+        name: "adminUsers",
+        component: Admin,
+      }]
   },
   // 404
   {
