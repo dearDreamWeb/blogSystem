@@ -7,6 +7,7 @@ const Error = () => import("@/views/404.vue");
 const Post = () => import("@/views/Post.vue");
 const AdminLogin = () => import("@/views/AdminLogin.vue");
 const Admin = () => import("@/views/Admin.vue");
+const AdminHome = () => import("@/components/AdminHome.vue");
 
 
 Vue.use(VueRouter);
@@ -57,22 +58,22 @@ const routes = [
       {
         path: "home",
         name: "adminHome",
-        component: Admin,
+        component: AdminHome,
       },
       {
         path: "post_lists",
         name: "adminPostLists",
-        component: Admin,
+        component: AdminHome,
       },
       {
         path: "users",
         name: "users",
-        component: Admin,
+        component: AdminHome,
       },
       {
         path: "admin_users",
         name: "adminUsers",
-        component: Admin,
+        component: AdminHome,
       }]
   },
   // 404

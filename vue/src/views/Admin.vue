@@ -38,6 +38,7 @@
                   </div>
                   <!-- 判断是否选中在当前一级导航或子导航，添加样式 -->
                   <i
+                    v-if="item.subnav"
                     :class="[
                       'el-icon-caret-right',
                       'icon',
@@ -87,7 +88,8 @@
         </el-aside>
         <!-- 右侧内容区 -->
         <el-main class="right_conent">
-          <!-- <router-view></router-view> -->
+          
+          <router-view></router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -248,10 +250,7 @@ export default {
         }
       }
     }
-    // 后侧内容区
-    .right_conent {
-      // padding: 10px;
-    }
+
     @media screen and (max-width: 768px) {
       display: flex;
       flex-direction: column;
