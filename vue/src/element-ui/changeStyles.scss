@@ -1,0 +1,38 @@
+@import "../common/styles/index.scss";
+// 侧边栏菜单
+.el-menu {
+  background-color: $deep_black;
+  .el-submenu {
+    .el-submenu__title {
+      color: $div_bgColor;
+      i {
+        color: $div_bgColor;
+      }
+      &:hover {
+        background-color: $green;
+      }
+    }
+    .el-menu-item {
+      color: $div_bgColor;
+      &:hover {
+        background-color: $green;
+      }
+    }
+    //  被点击
+    .is-active {
+      background-color: $green;
+    }
+  }
+  .el-menu-item {
+    color: $div_bgColor;
+    i {
+      color: $div_bgColor;
+    }
+    &:hover {
+      background-color: $green;
+    }
+  }
+  .el-menu-item.is-active {
+    background-color: $green;
+  }
+}

@@ -3,7 +3,18 @@
     <el-container>
       <!-- 头部 -->
       <el-header class="header">
-        <img src="../assets/images/admin_logo.png" alt="logo" class="logo" />
+        <!-- 左边 -->
+        <div class="left">
+          <img src="../assets/images/admin_logo.png" alt="logo" class="logo" />
+          <!-- 开关 -->
+          <el-switch
+            v-model="isCollapse"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch>
+        </div>
+        <!-- 右边 -->
         <div class="right">
           <!-- 下拉菜单 -->
           <el-dropdown class="dropdown">
@@ -20,75 +31,54 @@
       <!-- 主体部分 -->
       <el-container class="container">
         <!-- 侧边栏 -->
-        <el-aside width="200px" class="left_aside">
-          <ul>
-            <li v-for="(item, index) in navData" :key="index" class="nav">
-              <!-- 一级导航 -->
-              <div
-                :class="['nav_main', { active: activeIndex === item.index }]"
-                @click="activeIndex = item.index"
+        <el-aside width="auto" class="left_aside">
+          <el-menu
+            :default-active="activeIndex"
+            class="el-menu-vertical-demo"
+            :collapse="isCollapse"
+            :unique-opened="true"
+          >
+            <div v-for="(item, index) in navData" :key="index">
+              <!-- 
+                一级导航 
+                使用了v-if和v-else，
+                因为没有二级导航的话一级导航直接使用el-menu-item；
+                有二级导航的话一级导航用el-sumenu
+              -->
+              <el-submenu
+                v-if="item.subnav"
+                :index="item.index"
+                @click="jumpRouter(item.index, item.path)"
               >
-                <router-link
-                  :to="item.subnav ? '' : item.path"
-                  class="nav_title"
-                >
-                  <div>
-                    <i :class="item.icon"></i>
-                    {{ item.title }}
-                  </div>
-                  <!-- 判断是否选中在当前一级导航或子导航，添加样式 -->
-                  <i
-                    v-if="item.subnav"
-                    :class="[
-                      'el-icon-caret-right',
-                      'icon',
-                      {
-                        activeIcon:
-                          activeIndex === item.index ||
-                          item.index === activeIndex[0],
-                      },
-                    ]"
-                  ></i
-                ></router-link>
-              </div>
-              <!-- 判断有没有二级导航  引入transition动画-->
-              <div v-if="item.subnav">
-                <transition
-                  name="fade"
-                  enter-active-class="animate__animated animate__fadeIn"
-                  leave-active-class="animate__animated animate__slideOutUp"
-                  :duration="{ enter: 200, leave: 300 }"
-                >
-                  <!-- 判断是否选中在当前一级导航或子导航，来决定是否显示子导航 -->
-                  <ul
-                    v-show="
-                      activeIndex === item.index ||
-                        item.index === activeIndex[0]
-                    "
-                    class="subnav"
-                  >
-                    <li
-                      v-for="(subItem, subIndex) in item.subnav"
-                      :key="subIndex"
-                      :class="[
-                        'subnav_main',
-                        { active: activeIndex === subItem.index },
-                      ]"
-                      @click="activeIndex = subItem.index"
-                    >
-                      <router-link :to="subItem.path" class="subnav_title">{{
-                        subItem.title
-                      }}</router-link>
-                    </li>
-                  </ul>
-                </transition>
-              </div>
-            </li>
-          </ul>
+                <template slot="title">
+                  <i :class="item.icon"></i>
+                  <span slot="title">{{ item.title }}</span>
+                </template>
+                <!-- 二级导航 -->
+                <template v-if="item.subnav">
+                  <el-menu-item
+                    v-for="(subItem, subIndex) in item.subnav"
+                    :key="subIndex"
+                    :index="subItem.index"
+                    @click="jumpRouter(subItem.index, subItem.path)"
+                    >{{ subItem.title }}
+                  </el-menu-item>
+                </template>
+              </el-submenu>
+              <!-- 没有二级导航的样式 -->
+              <el-menu-item
+                v-else
+                :index="item.index"
+                @click="jumpRouter(item.index, item.path)"
+              >
+                <i :class="item.icon"></i>
+                <span slot="title">{{ item.title }}</span>
+              </el-menu-item>
+            </div>
+          </el-menu>
         </el-aside>
         <!-- 右侧内容区 -->
         <el-main class="right_conent">
-          
           <router-view></router-view>
         </el-main>
       </el-container>
@@ -139,6 +129,7 @@ export default {
         },
       ],
       activeIndex: "1", // 当前访问的导航
+      isCollapse: false, // 是否折叠左侧导航栏
     };
   },
   methods: {
@@ -160,6 +151,19 @@ export default {
         }
       });
     },
+    // 改变当前路由和选择导航
+    jumpRouter(index, path) {
+      this.activeIndex = index;
+      if (!path) return;
+      this.$router.push(path);
+    },
+
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
+    },
   },
   mounted() {
     this.initActiveIndex();
@@ -174,9 +178,17 @@ export default {
     justify-content: space-between;
     align-items: center;
     background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);
-    .logo {
+    // 头部左边
+    .left {
+      display: flex;
+      align-items: center;
       height: 100%;
+      .logo {
+        margin-right: 50px;
+        height: 100%;
+      }
     }
+    // 头部右边
     .right {
       .dropdown {
         color: $div_bgColor;
@@ -197,57 +209,12 @@ export default {
       padding: 20px 0;
       height: 100vh;
       background: $deep_black;
-      .nav {
-        .nav_main {
-          padding: 20px;
-          .nav_title {
-            display: flex;
-            justify-content: space-between;
-            color: $div_bgColor;
-            .icon {
-              transition: all 0.5s linear;
-              &::before {
-                color: $div_bgColor;
-              }
-            }
-            .activeIcon {
-              transform: rotateZ(90deg);
-            }
-          }
-          &:hover {
-            cursor: pointer;
-            background: $green;
-          }
-        }
-        // 点击样式
-        .active {
-          background: $green;
-        }
-        //  二级导航
-        .subnav {
-          .subnav_main {
-            padding: 20px 30px;
-            &:hover {
-              cursor: pointer;
-              background: $green;
-              .subnav_title {
-                display: inline-block;
-                width: 100%;
-                height: 100%;
-                color: $div_bgColor;
-              }
-            }
-          }
-          .active {
-            background: $green;
-            .subnav_title {
-              display: inline-block;
-              width: 100%;
-              height: 100%;
-              color: $div_bgColor;
-            }
-          }
-        }
+      // .el-menu {
+      //   width: 50px;
+      // }
+      .el-menu-vertical-demo:not(.el-menu--collapse) {
+        width: 200px;
+        // min-width: 400px;
       }
     }
 
