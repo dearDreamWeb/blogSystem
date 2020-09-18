@@ -9,11 +9,7 @@ function Store(webStorage) {
      * @param {String} key  要获取的key值的数据
      */
     this.getItem = function (key) {
-        let val = this.storage.getItem(key);
-        if (typeof val === "object") {
-            val = JSON.parse(val);
-        }
-        return val;
+        return JSON.parse(this.storage.getItem(key));
     }
 
     /**
@@ -22,10 +18,7 @@ function Store(webStorage) {
      * @param {String,Object,Array} val  要新建的数据的value值
      */
     this.setItem = function (key, val) {
-        if (typeof val === "object") {
-            val = JSON.stringify(val);
-        }
-        return this.storage.setItem(key, val);
+        return this.storage.setItem(key, JSON.stringify(val));
     }
 
     /**

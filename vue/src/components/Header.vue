@@ -214,10 +214,11 @@ export default {
   }
   .user {
     display: flex;
+    height: 100%;
     justify-content: flex-end;
     align-items: center;
     .avatar {
-      padding: 0 0.5rem;
+      margin: 0 0.5rem;
       width: 2rem;
       border-radius: 50%;
       &:hover {

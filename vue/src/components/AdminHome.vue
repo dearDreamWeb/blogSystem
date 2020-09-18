@@ -162,7 +162,6 @@ export default {
       // 基于准备好的dom，初始化echarts实例
       let myChart = echarts.init(document.getElementById("ageBar"));
       let option = {
-        color: ["#3398DB"],
         title: {
           text: "年龄比例",
           left: "center",
@@ -171,8 +170,10 @@ export default {
           trigger: "axis",
           axisPointer: {
             // 坐标轴指示器，坐标轴触发有效
-            type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
+            type: "none", // 默认为直线，可选为：'line' | 'shadow'
+            show: false,
           },
+          // 当鼠标移入的样式
           formatter: val => {
             let perData = val[0].data; // 百分比数据
             let title = val[0].name; // x轴坐标名字
@@ -208,7 +209,7 @@ export default {
             axisLabel: {
               show: true,
               interval: "auto",
-              formatter: "{value}%",
+              formatter: "{value}%",  // y轴数值百分比
             },
           },
         ],
@@ -224,15 +225,27 @@ export default {
               formatter: "{c}%",
             },
             showBackground: true,
+            // 每个柱状图的颜色不同
+            itemStyle: {
+              normal: {
+                color: function(params) {
+                  let colors = [
+                    "#3398DB",
+                    "#e4393c",
+                    "#009688",
+                    "#dab70d",
+                    "#d908dc",
+                    "#0db6c7",
+                  ];
+                  return colors[params.dataIndex];
+                },
+              },
+            },
           },
         ],
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
-      // function tipFormatter(val){
-      //   console.log(val);
-      //   return val;
-      // }
     },
   },
   filters: {

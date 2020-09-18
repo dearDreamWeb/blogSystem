@@ -35,7 +35,7 @@ export default new Vuex.Store({
     },
     // 设置管理员账号
     setAdminUsername(state, data) {
-      state.userInfo = data;
+      state.adminUsername = data;
       store.setItem("adminUsername", data);
     }
   },

@@ -212,7 +212,6 @@ export default {
     await this.initData(this.$route.params.content);
     this.initSupportArr();
     this.content();
-    console.log();
   },
   components: {
     BackTop,

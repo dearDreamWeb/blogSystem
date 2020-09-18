@@ -29,7 +29,7 @@ export default {
     },
   },
   watch: {
-    // 监听陆游的变化
+    // 监听路由的变化
     $route(to) {
       // 匹配/admin或者/admin/或者/admin/....路径
       let reg = /^\/admin|^\/admin[\/|\/\S+]/;

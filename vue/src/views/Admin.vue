@@ -207,6 +207,7 @@ export default {
     this.initActiveIndex();
     this.adminIsLogin();
   },
+  // 路由拦截 
   beforeRouteEnter(to, from, next) {
     next(vm => {
       let adminUsername = vm.$store.getters.getAdminUsername;
