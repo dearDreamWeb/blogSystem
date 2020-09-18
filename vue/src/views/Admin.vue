@@ -78,8 +78,19 @@
           </el-menu>
         </el-aside>
         <!-- 右侧内容区 -->
-        <el-main class="right_conent">
-          <router-view></router-view>
+        <el-main class="right_content" @scroll.stop="">
+          <!-- 面包屑导航 -->
+          <el-breadcrumb separator="/" class="breadcrumb_wrap">
+            <el-breadcrumb-item
+              v-for="(item, index) in breadcrumbData"
+              :key="index"
+              >{{ item }}</el-breadcrumb-item
+            >
+          </el-breadcrumb>
+          <!-- 子路由 -->
+          <div class="view_wrap">
+            <router-view></router-view>
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -130,6 +141,7 @@ export default {
       ],
       activeIndex: "1", // 当前访问的导航
       isCollapse: false, // 是否折叠左侧导航栏
+      adminUsername: "",
     };
   },
   methods: {
@@ -157,22 +169,60 @@ export default {
       if (!path) return;
       this.$router.push(path);
     },
-
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
+    // 判断管理是否已登录
+    adminIsLogin() {
+      this.$axios({
+        method: "get",
+        url: "/admin/isLogin",
+      })
+        .then(res => {
+          if (res.data.status === 0) {
+            this.$store.commit("setAdminUsername", res.data.adminUsername);
+            this.adminUsername = res.data.adminUsername;
+          }
+        })
+        .catch(err => console.log(err));
     },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
+    // 获取用户数据
+  },
+  computed: {
+    // 面包屑的导航信息
+    breadcrumbData() {
+      let navArr = [];
+      // 得到当前导航的一级导航和二级导航
+      let arr = this.navData.filter(item => {
+        return item.index === this.activeIndex[0];
+      });
+      navArr.push(arr[0].title);
+      if (arr[0].subnav) {
+        let arr1 = arr[0].subnav.filter(
+          item => item.index === this.activeIndex
+        );
+        navArr.push(arr1[0].title);
+      }
+      return navArr;
     },
   },
   mounted() {
     this.initActiveIndex();
+    this.adminIsLogin();
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      let adminUsername = vm.$store.getters.getAdminUsername;
+      if (!adminUsername) {
+        vm.$message.info("管理员未登录，请先登录");
+        vm.$router.push("/");
+        return false;
+      }
+    });
   },
 };
 </script>
 <style lang="scss" scoped>
 @import "../common/styles/index.scss";
 .admin {
+  // overflow: hidden;
   .header {
     display: flex;
     justify-content: space-between;
@@ -207,14 +257,11 @@ export default {
     //   左侧导航栏
     .left_aside {
       padding: 20px 0;
-      height: 100vh;
+      height: calc(100vh - 60px);
       background: $deep_black;
-      // .el-menu {
-      //   width: 50px;
-      // }
       .el-menu-vertical-demo:not(.el-menu--collapse) {
         width: 200px;
-        // min-width: 400px;
+        // min-height: 400px;
       }
     }
 
@@ -224,6 +271,20 @@ export default {
       .left_aside {
         width: 100vw !important;
         height: auto;
+      }
+    }
+    // 右侧内容区
+    .right_content {
+      padding: 0;
+      background-color: $bgColor;
+      height: calc(100vh - 60px);
+      .breadcrumb_wrap {
+        padding: 10px 20px;
+        background-color: $div_bgColor;
+        border-bottom: $border_bottom;
+      }
+      .view_wrap {
+        padding: 20px;
       }
     }
   }

@@ -96,6 +96,7 @@ export default {
           })
             .then(res => {
               if (res.data.status === 0) {
+                this.$store.commit("setAdminUsername",res.data.adminUsername);
                 this.$message.success(res.data.message);
                 this.$router.push("/admin")
               } else {

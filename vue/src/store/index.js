@@ -1,12 +1,16 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import Store from "../utils/storage";
 
 Vue.use(Vuex);
+const store = new Store("sessionStorage");
 
 export default new Vuex.Store({
   state: {
     // 用户信息
-    userInfo: JSON.parse(window.sessionStorage.getItem("userInfo"))
+    userInfo: store.getItem("userInfo"),
+    // 管理员账号
+    adminUsername: store.getItem("adminUsername")
 
   },
   getters: {
@@ -14,6 +18,9 @@ export default new Vuex.Store({
       return {
         userInfo: state.userInfo
       }
+    },
+    getAdminUsername(state) {
+      return state.adminUsername
     }
   },
   mutations: {
@@ -24,7 +31,12 @@ export default new Vuex.Store({
         isLogin: true
       };
       state.userInfo = objUserInfo;
-      window.sessionStorage.setItem("userInfo", JSON.stringify(objUserInfo));
+      store.setItem("userInfo", objUserInfo);
+    },
+    // 设置管理员账号
+    setAdminUsername(state, data) {
+      state.userInfo = data;
+      store.setItem("adminUsername", data);
     }
   },
   modules: {}

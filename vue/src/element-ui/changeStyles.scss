@@ -36,3 +36,16 @@
     background-color: $green;
   }
 }
+// 当侧边栏菜单折叠时的样式
+.el-menu--collapse {
+  .el-submenu {
+    .el-submenu__title {
+      span{
+        display: none;
+      }
+      .el-submenu__icon-arrow.el-icon-arrow-right {
+        display: none;
+      }
+    }
+  }
+}
