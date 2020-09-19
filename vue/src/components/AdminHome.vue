@@ -1,9 +1,8 @@
 <template>
   <div class="admin_home">
     <header class="header">
-      欢迎管理员：<span class="admin_user">admin</span> 当前时间：{{
-        new Date() | formatDate
-      }}
+      欢迎管理员：<span class="admin_user">{{ adminUsername }}</span>
+      当前时间：{{ new Date() | formatDate }}
     </header>
     <section class="data_count">
       <el-row>
@@ -36,11 +35,17 @@
       </el-row>
     </section>
     <el-row class="echarts_wrap">
+      <!-- 男女比例饼状图 -->
       <el-col :md="12" class="echart_sexPie">
         <div id="sexPie"></div>
       </el-col>
+      <!-- 年龄分布的柱状图 -->
       <el-col :md="12" class="echart_ageBar">
         <div id="ageBar"></div>
+      </el-col>
+      <!-- 每月新用户注册折线图 -->
+      <el-col :md="24" class="echart_newUsers">
+        <div id="newUsers"></div>
       </el-col>
     </el-row>
   </div>
@@ -53,6 +58,7 @@ let echarts = require("echarts/lib/echarts");
 // 引入饼状图组件
 require("echarts/lib/chart/pie");
 require("echarts/lib/chart/bar");
+require("echarts/lib/chart/line");
 // 引入提示框和title组件
 require("echarts/lib/component/title");
 require("echarts/lib/component/tooltip");
@@ -62,36 +68,47 @@ require("echarts/lib/component/axis");
 //引入模型Series
 require("echarts/lib/model/Series");
 export default {
+  props: {
+    adminUsername: {
+      type: String,
+      isRequire: true,
+    },
+  },
   data() {
     return {
-      users: 166, //用户量
-      views: 500, // 用户访问量
-      supports: 33, // 文章点赞量
-      comments: 12, //  文章评论量
-      ageCategoires: [21, 44, 36, 52, 11, 2], //年龄分组，对应["00后", "90后", "80后", "70后", "60后", "60前"]
+      users: {
+        all: 0,
+        man: 0,
+        woman: 0,
+      }, //用户量,all：所有人，man：男人，woman：女人
+      views: 0, // 用户访问量
+      yearNewUsers: {}, // 近一年新用户注册量的信息
+      supports: 0, // 文章点赞量
+      comments: 0, //  文章评论量
+      ageCategoires: [], //年龄分组，对应["00后", "90后", "80后", "70后", "60后", "60前"]
       // 统计数据
       dataCount: [
         {
           title: "用户量",
-          count: this.users,
+          count: 0,
           icon: "el-icon-user",
           bgColor: "#1e9fff",
         },
         {
           title: "用户访问量",
-          count: this.views,
+          count: 0,
           icon: "el-icon-view",
           bgColor: "#009688",
         },
         {
           title: "文章点赞量",
-          count: this.supports,
+          count: 0,
           icon: "iconfont icon-zhichi",
           bgColor: "#e4393c",
         },
         {
           title: "文章评论量",
-          count: this.comments,
+          count: 0,
           icon: "iconfont icon-pinglun post_footer_item",
           bgColor: "#dab70d",
         },
@@ -101,10 +118,21 @@ export default {
   methods: {
     // 初始化DataCount
     initDataCount() {
-      this.dataCount[0].count = this.users;
-      this.dataCount[1].count = this.views;
-      this.dataCount[2].count = this.supports;
-      this.dataCount[3].count = this.comments;
+      this.$axios({
+        method: "get",
+        url: "/admin/homeData",
+      })
+        .then(res => {
+          if (res.data.status === 0) {
+            this.users = res.data.data.users;
+            this.views = res.data.data.views;
+            this.yearNewUsers = res.data.data.yearNewUsers;
+            this.supports = res.data.data.supports;
+            this.comments = res.data.data.comments;
+            this.ageCategoires = res.data.data.ageCategoires;
+          }
+        })
+        .catch(err => console.log(err));
     },
     // 男女比例饼状图
     sexPie() {
@@ -132,8 +160,8 @@ export default {
             radius: "55%",
             center: ["50%", "60%"],
             data: [
-              { value: 2, name: "男" },
-              { value: 1, name: "女" },
+              { value: this.users.man, name: "男" },
+              { value: this.users.woman, name: "女" },
             ],
             emphasis: {
               itemStyle: {
@@ -155,7 +183,7 @@ export default {
       let newAgeCate = [];
       // 人数除以总人口数得到百分比年龄段
       this.ageCategoires.forEach(item => {
-        let num = (item / this.users) * 100;
+        let num = (item / this.users.all) * 100;
         newAgeCate.push(num.toFixed(1));
       });
 
@@ -209,7 +237,7 @@ export default {
             axisLabel: {
               show: true,
               interval: "auto",
-              formatter: "{value}%",  // y轴数值百分比
+              formatter: "{value}%", // y轴数值百分比
             },
           },
         ],
@@ -247,6 +275,47 @@ export default {
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
     },
+
+    // 每月新用户注册折线图
+    newUser() {
+      // 基于准备好的dom，初始化echarts实例
+      let myChart = echarts.init(document.getElementById("newUsers"));
+      let option = {
+        title: {
+          text: "近一年新用户注册人数",
+          left: "left",
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "cross",
+            label: {
+              backgroundColor: "#6a7985",
+            },
+          },
+        },
+        xAxis: {
+          type: "category",
+          boundaryGap: false,
+          data: Object.keys(this.yearNewUsers),
+        },
+        yAxis: {
+          type: "value",
+        },
+        series: [
+          {
+            data: Object.values(this.yearNewUsers),
+            type: "line",
+            itemStyle: {
+              color: "#45b1c2",
+            },
+            areaStyle: {},
+          },
+        ],
+      };
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+    },
   },
   filters: {
     formatDate(val) {
@@ -254,13 +323,14 @@ export default {
     },
   },
   mounted() {
-    this.initDataCount();
-    this.sexPie();
-    this.ageBar();
+    this.$nextTick(async () => {
+      await this.initDataCount();
+    });
   },
   watch: {
     users(val) {
-      this.dataCount[0].count = val;
+      this.dataCount[0].count = val.all;
+      this.sexPie();
     },
     views(val) {
       this.dataCount[1].count = val;
@@ -270,6 +340,12 @@ export default {
     },
     comments(val) {
       this.dataCount[3].count = val;
+    },
+    yearNewUsers() {
+      this.newUser();
+    },
+    ageCategoires() {
+      this.ageBar();
     },
   },
 };
@@ -341,12 +417,14 @@ export default {
   .echarts_wrap {
     margin-top: 30px;
     .echart_sexPie,
-    .echart_ageBar {
+    .echart_ageBar,
+    .echart_newUsers {
       padding: 10px;
       height: 400px;
       border-radius: 3px;
       #sexPie,
-      #ageBar {
+      #ageBar,
+      #newUsers {
         padding: 10px;
         height: 100%;
         background-color: $div_bgColor;

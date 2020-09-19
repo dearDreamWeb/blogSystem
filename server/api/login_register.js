@@ -16,6 +16,7 @@ module.exports = (router, crud) => {
     // 用户注册
     router.get("/register", (req, res) => {
         let jsonDatas = JSON.parse(req.query.ruleForm);
+        const moment = require("moment"); //格式化时间工具
         // 引入随机id值
         let randomId = require("../randomId")();
         let objDatas = {
@@ -27,7 +28,8 @@ module.exports = (router, crud) => {
             user_email: jsonDatas.email,
             user_birthday: jsonDatas.birthday,
             user_address: jsonDatas.address.join(""),
-            user_nickName: jsonDatas.nickName
+            user_nickName: jsonDatas.nickName,
+            user_createdTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         }
         crud("SELECT * FROM `users` WHERE user_name =?", [jsonDatas.name], data => {
             // 判断用户名是否已被注册，若已注册，返回{state:1}
@@ -76,9 +78,8 @@ module.exports = (router, crud) => {
     // 注销
     router.get("/loginOut", (req, res) => {
         //注销session
-        req.session.destroy(() => {
-            res.json({ state: 0 });
-        });
+        req.session.userInfo = null;
+        res.json({ state: 0 });
     })
 
     /**

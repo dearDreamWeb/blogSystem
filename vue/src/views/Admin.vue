@@ -19,10 +19,13 @@
           <!-- 下拉菜单 -->
           <el-dropdown class="dropdown">
             <span class="el-dropdown-link">
-              admin<i class="el-icon-arrow-down el-icon--right"></i>
+              {{ adminUsername }}
+              <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>注销</el-dropdown-item>
+              <el-dropdown-item @click.native="loginOut()"
+                >注销</el-dropdown-item
+              >
             </el-dropdown-menu>
           </el-dropdown>
           <router-link to="/" class="reception_home">前台首页</router-link>
@@ -89,7 +92,7 @@
           </el-breadcrumb>
           <!-- 子路由 -->
           <div class="view_wrap">
-            <router-view></router-view>
+            <router-view @adminUsername="adminUsername"></router-view>
           </div>
         </el-main>
       </el-container>
@@ -169,6 +172,23 @@ export default {
       if (!path) return;
       this.$router.push(path);
     },
+
+    // 退出登录
+    loginOut() {
+      this.$axios({
+        method: "get",
+        url: "/admin/loginOut",
+      })
+        .then(res => {
+          if (res.data.status === 0) {
+            this.$store.commit("setAdminUsername", "");
+            this.$message.success("管理注销成功");
+            this.$router.push("/");
+          }
+        })
+        .catch(err => console.log(err));
+    },
+
     // 判断管理是否已登录
     adminIsLogin() {
       this.$axios({
@@ -179,6 +199,9 @@ export default {
           if (res.data.status === 0) {
             this.$store.commit("setAdminUsername", res.data.adminUsername);
             this.adminUsername = res.data.adminUsername;
+          } else {
+            this.$message.info(res.data.mess);
+            this.$router.push("/");
           }
         })
         .catch(err => console.log(err));
@@ -207,7 +230,7 @@ export default {
     this.initActiveIndex();
     this.adminIsLogin();
   },
-  // 路由拦截 
+  // 路由拦截
   beforeRouteEnter(to, from, next) {
     next(vm => {
       let adminUsername = vm.$store.getters.getAdminUsername;
