@@ -154,7 +154,7 @@ export default {
 
     //  昵称校验
     let validateNickName = (rule, value, callback) => {
-      let regWord = /[`!#$%^&*@,.()+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘、，|《。》？、【】[\]]/i;
+      let regWord = /[`!#$%^&*,.()+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘，|《。》？【】[\]]/i;
       let regNickName = /[a-zA-Z0-9_\u4e00-\u9fa5]{3,9}/;
       if (!value) {
         return callback(new Error("昵称不能为空"));
@@ -163,7 +163,7 @@ export default {
       } else if (!regNickName.test(value)) {
         return callback(
           new Error(
-            "昵称长度必须是3到9个字符，只能包含英文、中文、下划线和数字"
+            "昵称长度必须是3到9个字符，只能包含英文、中文、数字和_@、"
           )
         );
       } else {

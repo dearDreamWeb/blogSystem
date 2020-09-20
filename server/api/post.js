@@ -49,22 +49,44 @@ module.exports = (router, crud) => {
         }
         // 模糊查询文章标题或者文章内容
         if (req.query.search_content) {
-            crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_content LIKE '%" + req.query.search_content + "%' OR post_title LIKE '%" + req.query.search_content + "%'  ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
-                data => {
-                    res.json({
-                        state: 0,
-                        allPost: data
+            let reg = /^#.*#$/; // 以#开头和结尾
+            // 以#开头和结尾的话代表是标签搜索,否则就是对文章标题和内容进行搜索
+            if (reg.test(req.query.search_content)) {
+                crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [req.query.search_content],
+                    data => {
+                        data.forEach(item => {
+                            item.user_password = ""
+                        })
+                        res.json({
+                            state: 0,
+                            allPost: data
+                        });
                     });
-                });
+            } else {
+                crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_content LIKE '%" + req.query.search_content + "%' OR post_title LIKE '%" + req.query.search_content + "%'  ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
+                    data => {
+                        data.forEach(item => {
+                            item.user_password = ""
+                        })
+                        res.json({
+                            state: 0,
+                            allPost: data
+                        });
+                    });
+            }
+
         } else {
-            // 所有的文章
-            crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
-                data => {
-                    res.json({
-                        state: 0,
-                        allPost: data
-                    });
+            // 所有的文章 "SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
+            crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
+            ORDER BY ${sort_rule} ${sort_orderBy}`, [], data => {
+                data.forEach(item => {
+                    item.user_password = ""
+                })
+                res.json({
+                    state: 0,
+                    allPost: data
                 });
+            });
         }
 
     });
@@ -139,6 +161,11 @@ module.exports = (router, crud) => {
                         arr
                     })
                 }
+            })
+        } else {
+            res.json({
+                state: 1,
+                mess: "用户未登录"
             })
         }
     });

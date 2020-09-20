@@ -98,7 +98,7 @@ module.exports = (router, crud) => {
                 let createdTimeMonth = new Date(item.user_createdTime).getMonth() + 1; // 文章发布的月份
                 if (item.user_sex === 1) {
                     objData.users.man++;
-                }else{
+                } else {
                     objData.users.woman++;
                 }
                 for (const key in months) {
@@ -116,11 +116,11 @@ module.exports = (router, crud) => {
         // 获取年龄分组情况，按照["00后", "90后", "80后", "70后", "60后", "60前"]分组
         function getAgeCategories(data) {
             let obj = {}
-            let arrYear = [2020, 1990, 1980, 1970, 1960, 0];
+            let arrYear = [2000, 1990, 1980, 1970, 1960, 0];
             arrYear.forEach(item => {
                 obj[item] = 0;
             });
-            
+
             data.forEach(item => {
                 let year = new Date(item.user_birthday).getFullYear();
                 for (let i = 0; i < arrYear.length; i++) {

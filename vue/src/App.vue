@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <!-- 头部 -->
-    <v-header v-if="showHeader"></v-header>
-    <router-view v-if="isReload"></router-view>
+    <v-header v-if="showHeader" :postTag="postTag" @searchPostTag="searchPostTag"></v-header>
+    <router-view v-if="isReload" @searchPostTag="searchPostTag"></router-view>
   </div>
 </template>
 
@@ -13,6 +13,7 @@ export default {
     return {
       isReload: true,
       showHeader: true,
+      postTag: "",
     };
   },
   provide() {
@@ -26,6 +27,10 @@ export default {
       this.$nextTick(() => {
         this.isReload = true;
       });
+    },
+    // 子组件转入标签
+    searchPostTag(data) {
+      this.postTag = data;
     },
   },
   watch: {

@@ -14,6 +14,7 @@ query = (sql, values, callback) => {
             if (err) throw new Error(`sql语句失败：${err}`);
             //释放连接
             pool.releaseConnection(connection);
+
             //回调函数
             callback && callback(data);
         })

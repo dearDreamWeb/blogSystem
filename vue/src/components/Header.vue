@@ -12,7 +12,7 @@
       <el-input
         type="text"
         class="search"
-        placeholder="搜索文章标题或内容"
+        placeholder="搜索文章标题、文章内容或文章标签"
         v-model="searchVal"
         clearable
         @keydown.enter.native="searchPost"
@@ -75,6 +75,12 @@ import Register from "./Register";
 export default {
   name: "Header",
   inject: ["reload"], //刷新页面
+  props: {
+    postTag: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       searchVal: "",
@@ -90,6 +96,14 @@ export default {
       // 判断当注销过用户信息后不调用getUserInfo方法
       let userInfo = this.$store.getters.getUserInfo;
       userInfo.userInfo && this.getUserInfo();
+    },
+
+    // 搜索标签
+    searchPostTag() {
+      if (this.postTag !== "") {
+        this.searchVal = this.postTag;
+        this.searchPost();
+      }
     },
 
     // 接收子组件的自定义事件关闭模态框
@@ -172,6 +186,9 @@ export default {
      * 搜索文章标题或者内容
      */
     searchPost() {
+      if (this.searchVal !== this.postTag) {
+        this.$emit("searchPostTag", "");
+      }
       this.$router.push({
         name: "searchLink",
         params: {
@@ -183,6 +200,15 @@ export default {
   },
   created() {
     this.initData();
+    this.searchPostTag();
+  },
+  watch: {
+    postTag() {
+      if (this.postTag !== "") {
+        this.searchVal = this.postTag;
+        this.searchPost();
+      }
+    },
   },
   components: {
     vLogin: Login,

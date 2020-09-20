@@ -71,7 +71,7 @@ export default {
   props: {
     adminUsername: {
       type: String,
-      isRequire: true,
+      required: true,
     },
   },
   data() {

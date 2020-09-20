@@ -1,5 +1,9 @@
 <template>
-  <div class="home">
+  <div
+    class="home"
+    v-loading="this.allPost.length === 0"
+    element-loading-text="拼命加载中"
+  >
     <!-- 排序规则 -->
     <div class="sort">
       <el-select
@@ -40,17 +44,23 @@
           <h2 class="post_content" ref="post_content"></h2>
           <!-- 文章列表尾部 -->
           <div class="post_footer">
-            <!-- 点击作者头像或者名字跳转作者的个人中心 -->
-            <div
-              @click="
-                $router.push({
-                  name: 'aboutLink',
-                  params: { id: item.user_id },
-                })
-              "
-            >
-              <img class="avatar" :src="item.user_avatar" alt="头像" />
-              <span class="userName">{{ item.user_nickName }}</span>
+            <div class="footer_left">
+              <!-- 点击作者头像或者名字跳转作者的个人中心 -->
+              <div
+                @click="
+                  $router.push({
+                    name: 'aboutLink',
+                    params: { id: item.user_id },
+                  })
+                "
+              >
+                <img class="avatar" :src="item.user_avatar" alt="头像" />
+                <span class="userName">{{ item.user_nickName }}</span>
+              </div>
+              <!-- 点击搜索标签 -->
+              <span class="postTag" @click="searchPostTag(item.post_tag)">{{
+                item.post_tag
+              }}</span>
             </div>
             <!-- 点赞和阅读 -->
             <div class="tools">
@@ -114,12 +124,12 @@ export default {
           search_content: searchContent,
         },
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             this.allPost = res.data.allPost;
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -132,13 +142,13 @@ export default {
         method: "get",
         url: "/getSupportArr",
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             // 为supportArr赋值
             this.supportArr = res.data.arr;
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -175,7 +185,7 @@ export default {
           post_id: post_id,
         },
       })
-        .then((res) => {
+        .then(res => {
           /**
            * state为0代表取消点赞
            * state为1代表点赞
@@ -195,9 +205,14 @@ export default {
               break;
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
+    },
+
+    // 点击标签传给父组件
+    searchPostTag(postTag) {
+      this.$emit("searchPostTag", postTag);
     },
   },
   watch: {
@@ -208,10 +223,12 @@ export default {
       this.initData(this.$route.params.content);
     },
   },
-  async created() {
-    await this.initData(this.$route.params.content);
-    this.initSupportArr();
-    this.content();
+  async mounted() {
+    setTimeout(async () => {
+      await this.initData(this.$route.params.content);
+      this.initSupportArr();
+      this.content();
+    }, 100);
   },
   components: {
     BackTop,
@@ -270,19 +287,28 @@ export default {
         }
         .post_footer {
           position: relative;
-          .avatar {
-            width: 1.5rem;
-            height: 1.5rem;
-            border-radius: 50%;
-          }
-          .userName {
-            padding-left: 0.5rem;
-            vertical-align: super;
-            color: rgba(0, 0, 0, 0.7);
-            &:hover {
-              color: $diy_blue;
+          .footer_left {
+            display: flex;
+            align-items: center;
+            .avatar {
+              width: 1.5rem;
+              height: 1.5rem;
+              border-radius: 50%;
+            }
+            .userName,
+            .postTag {
+              padding-left: 0.5rem;
+              vertical-align: super;
+              color: rgba(0, 0, 0, 0.7);
+              &:hover {
+                color: $diy_blue;
+              }
+            }
+            .postTag {
+              color: $blue;
             }
           }
+
           .tools {
             display: flex;
             position: absolute;
