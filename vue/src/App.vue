@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <!-- 头部 -->
-    <v-header v-if="showHeader" :postTag="postTag" @searchPostTag="searchPostTag"></v-header>
+    <v-header
+      v-if="showHeader"
+      :postTag="postTag"
+      @searchPostTag="searchPostTag"
+    ></v-header>
     <router-view v-if="isReload" @searchPostTag="searchPostTag"></router-view>
   </div>
 </template>
@@ -13,7 +17,7 @@ export default {
     return {
       isReload: true,
       showHeader: true,
-      postTag: "",
+      postTag: "",  // 要搜索的文章标签
     };
   },
   provide() {

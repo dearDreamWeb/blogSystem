@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="home"
-    v-loading="this.allPost.length === 0"
-    element-loading-text="拼命加载中"
-  >
+  <div class="home">
     <!-- 排序规则 -->
     <div class="sort">
       <el-select

@@ -98,11 +98,14 @@ export default {
       userInfo.userInfo && this.getUserInfo();
     },
 
-    // 搜索标签
+    // 搜索标签 如果当前路由在searchLink时，输入框里填充搜索的值
     searchPostTag() {
       if (this.postTag !== "") {
         this.searchVal = this.postTag;
         this.searchPost();
+      }
+      if (this.$route.name === "searchLink") {
+        this.searchVal = this.$route.params.content;
       }
     },
 
@@ -200,12 +203,22 @@ export default {
   },
   created() {
     this.initData();
-    this.searchPostTag();
+    setTimeout(() => {
+      this.searchPostTag();
+    }, 50);
   },
   watch: {
+    // 监听postTag，赋值给searchVal
     postTag() {
       if (this.postTag !== "") {
         this.searchVal = this.postTag;
+        this.searchPost();
+      }
+    },
+    // 通过路由监听，当路由从searchLink到homeLink时，搜索所有文章
+    $route(to, from) {
+      if (from.name === "searchLink" && to.name === "homeLink") {
+        this.searchVal = "";
         this.searchPost();
       }
     },

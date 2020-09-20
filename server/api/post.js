@@ -156,11 +156,11 @@ module.exports = (router, crud) => {
                     data.forEach(item => {
                         arr.push(item.post_id);
                     })
-                    res.json({
-                        state: 0,
-                        arr
-                    })
                 }
+                res.json({
+                    state: 0,
+                    arr
+                })
             })
         } else {
             res.json({
