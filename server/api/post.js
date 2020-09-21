@@ -21,10 +21,10 @@ module.exports = (router, crud) => {
             crud("INSERT INTO `post` SET ?", objData, data => {
                 res.json({ state: 0 });
             })
-        }else {
+        } else {
             res.json({
-                status:1,
-                mess:"用户未登录，请先登录"
+                status: 1,
+                mess: "用户未登录，请先登录"
             })
         }
     });
@@ -37,7 +37,9 @@ module.exports = (router, crud) => {
      */
     router.post("/get_allPost", (req, res) => {
         let sort_orderBy = req.query.sort_orderBy === "1" ? "ASC" : "DESC";
-        let sort_rule;
+        let { currentPage, pageSize, sort_rule } = req.query;
+        let currentIndex = (currentPage - 1) * pageSize; // 开始索引的值
+        let total = 0;  // post表中的所有数据条数
         // 给sort_orderBy赋值，赋的值都是对应post表中的栏位名
         switch (req.query.sort_rule) {
             case "0":
@@ -53,48 +55,66 @@ module.exports = (router, crud) => {
                 sort_rule = "post_createTime"
                 break;
         }
-        // 模糊查询文章标题或者文章内容
-        if (req.query.search_content) {
-            let reg = /^#.*#$/; // 以#开头和结尾
-            // 以#开头和结尾的话代表是标签搜索,否则就是对文章标题和内容进行搜索
-            if (reg.test(req.query.search_content)) {
-                crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [req.query.search_content],
-                    data => {
-                        data.forEach(item => {
-                            item.user_password = ""
-                        })
-                        res.json({
-                            state: 0,
-                            allPost: data
-                        });
-                    });
+        //查询post表中所有的条数
+        crud(`SELECT count(post_id) FROM ` + "`post`" + ``, [], allArr => {
+            total = allArr[0]["count(post_id)"];
+            // 模糊查询文章标题或者文章内容
+            if (req.query.search_content) {
+                let reg = /^#.*#$/; // 以#开头和结尾
+                // 以#开头和结尾的话代表是标签搜索,否则就是对文章标题和内容进行搜索"SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
+                if (reg.test(req.query.search_content)) {
+                    //查询表中对应的所有数据的条数
+                    crud(`SELECT count(post_id) FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag=?`, [req.query.search_content], arr => {
+                        total = arr[0]["count(post_id)"];
+                        crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`,
+                            [req.query.search_content], data => {
+                                data.forEach(item => {
+                                    item.user_password = ""
+                                })
+                                res.json({
+                                    state: 0,
+                                    allPost: data,
+                                    total
+                                });
+                            });
+                    })
+
+                } else {
+                    // "SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_content LIKE '%" + req.query.search_content + "%' OR post_title LIKE '%" + req.query.search_content + "%'  ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
+                    crud(`SELECT count(post_id) FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON 
+                    post.post_masterId = users.user_id 
+                    WHERE post_content LIKE "%${req.query.search_content}%" OR post_title LIKE "%${req.query.search_content}%"`, [], arr => {
+                        total = arr[0]["count(post_id)"];
+                        crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
+                        WHERE post_content LIKE "%${req.query.search_content}%" OR post_title LIKE "%${req.query.search_content}%" ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`,
+                            [], data => {
+                                data.forEach(item => {
+                                    item.user_password = ""
+                                })
+                                res.json({
+                                    state: 0,
+                                    allPost: data,
+                                    total
+                                });
+                            });
+                    })
+                }
+
             } else {
-                crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_content LIKE '%" + req.query.search_content + "%' OR post_title LIKE '%" + req.query.search_content + "%'  ORDER BY " + sort_rule + ' ' + sort_orderBy + "", [],
-                    data => {
-                        data.forEach(item => {
-                            item.user_password = ""
-                        })
-                        res.json({
-                            state: 0,
-                            allPost: data
-                        });
+                // 所有的文章 "SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
+                crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
+            ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [], data => {
+                    data.forEach(item => {
+                        item.user_password = ""
+                    })
+                    res.json({
+                        state: 0,
+                        allPost: data,
+                        total
                     });
-            }
-
-        } else {
-            // 所有的文章 "SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
-            crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
-            ORDER BY ${sort_rule} ${sort_orderBy}`, [], data => {
-                data.forEach(item => {
-                    item.user_password = ""
-                })
-                res.json({
-                    state: 0,
-                    allPost: data
                 });
-            });
-        }
-
+            }
+        })
     });
 
 

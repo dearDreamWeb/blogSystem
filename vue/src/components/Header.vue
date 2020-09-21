@@ -221,7 +221,7 @@ export default {
     this.initData();
     setTimeout(() => {
       this.searchPostTag();
-    }, 50);
+    }, 300);
   },
   watch: {
     // 监听postTag，赋值给searchVal

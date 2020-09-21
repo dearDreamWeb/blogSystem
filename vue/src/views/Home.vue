@@ -82,6 +82,19 @@
         </li>
       </ul>
       <div class="noPost" v-else>暂无数据</div>
+      <!-- 底部分页 -->
+      <div class="page_footer">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="total"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          @current-change="changeCurrentPage"
+          :hide-on-single-page="total / pageSize <= 1"
+        >
+        </el-pagination>
+      </div>
     </div>
 
     <!-- 回到顶部 -->
@@ -97,6 +110,9 @@ export default {
   data() {
     return {
       allPost: [],
+      total: 0, // 数据总条数
+      currentPage: 1, // 当前页数
+      pageSize: 10, // 每页数据条数
       contentSlice: 80,
       supportArr: [],
       sortValue: 0, // 按照什么规则排序，默认是时间
@@ -118,11 +134,14 @@ export default {
           sort_rule: this.sortValue,
           sort_orderBy: this.radioValue,
           search_content: searchContent,
+          currentPage: this.currentPage,
+          pageSize: this.pageSize,
         },
       })
         .then(res => {
           if (res.data.state === 0) {
             this.allPost = res.data.allPost;
+            this.total = res.data.total;
           }
         })
         .catch(err => {
@@ -210,6 +229,16 @@ export default {
     searchPostTag(postTag) {
       this.$emit("searchPostTag", postTag);
     },
+
+    // 当页码改变时，重新请求数据
+    changeCurrentPage(val) {
+      this.currentPage = val;
+      this.$emit("changePageData", {
+        currentPage: this.currentPage,
+        pageSize: this.pageSize,
+      });
+      this.initData(this.$route.params.content);
+    },
   },
   watch: {
     sortValue() {
@@ -255,6 +284,7 @@ export default {
       margin: 0;
     }
   }
+  // 内容区
   .container {
     margin: 1rem auto 0;
     width: 60%;
@@ -343,6 +373,12 @@ export default {
           background: rgba(82, 81, 81, 0.1);
         }
       }
+    }
+    // 底部分页
+    .page_footer {
+      display: flex;
+      justify-content: center;
+      padding-top: 20px;
     }
     @media screen and (max-width: 768px) {
       width: 100%;
