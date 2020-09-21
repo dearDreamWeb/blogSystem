@@ -17,6 +17,45 @@
         </el-input>
       </div>
 
+      <!-- 文章标题选择 -->
+      <section class="tag_container">
+        <h2 class="post_tag">文章标签</h2>
+        <el-radio
+          v-for="(item, index) in tagsArr"
+          :key="index"
+          v-model="radio"
+          :label="index"
+          class="tag_item"
+        >
+          <el-tag :type="index === radio ? '' : 'success'">{{
+            item
+          }}</el-tag></el-radio
+        >
+        <el-button size="small" @click="centerDialogVisible = true"
+          >自定义标签</el-button
+        >
+        <!-- 添加自定义标签的对话框 -->
+        <el-dialog
+          title="自定义标签"
+          :visible.sync="centerDialogVisible"
+          width="30%"
+          center
+        >
+          <div class="dialog_content">
+            <p style="padding-bottom:10px">标签名称</p>
+            <el-input
+              v-model="diyTag"
+              placeholder="请输入自定义的标签名称"
+              @keydown.enter.native="addDiyTag"
+            ></el-input>
+          </div>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="centerDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="addDiyTag">确 定</el-button>
+          </span>
+        </el-dialog>
+      </section>
+
       <!-- 文章内容 -->
       <div id="wangeditor">
         <h2 class="post_contentHeader">文章内容</h2>
@@ -46,6 +85,20 @@ export default {
       title: "",
       title_maxLength: 30, //文章标题最大长度
       countTitle: "", //显示标题剩余的字数
+      radio: 0, // 文章标签选择的值
+      centerDialogVisible: false, // 是否显示对话框
+      diyTag: "", // 自定义标签名称
+      // 文章标签数组
+      tagsArr: [
+        "#生活#",
+        "#科技#",
+        "#游戏#",
+        "#教育#",
+        "#文学#",
+        "#情感#",
+        "#军事#",
+        "#人文#",
+      ],
     };
   },
   methods: {
@@ -56,7 +109,7 @@ export default {
       this.editor = new E(this.$refs.editorElem);
       this.editor.customConfig.uploadImgShowBase64 = true; // 使用 base64 保存图片
       // 编辑器的事件，每次改变会获取其html内容
-      this.editor.customConfig.onchange = (html) => {
+      this.editor.customConfig.onchange = html => {
         this.editorContent = html;
         this.catchData(this.editorContent); // 把这个html通过catchData的方法传入父组件
       };
@@ -100,17 +153,20 @@ export default {
               data: {
                 title: this.title,
                 content: this.editorContent,
+                tag: this.tagsArr[this.radio],
               },
             })
-              .then((res) => {
+              .then(res => {
                 if (res.data.state === 0) {
                   this.$message.success("发布成功");
                   this.title = "";
                   this.editorContent = "";
                   document.querySelector(".w-e-text").innerHTML = "";
+                } else {
+                  this.$message.info(res.data.mess);
                 }
               })
-              .catch((err) => {
+              .catch(err => {
                 console.log(err);
               });
           })
@@ -134,9 +190,16 @@ export default {
       document.querySelector(".w-e-text-container").style.zIndex = "0";
       // 修改工具栏中所有工具的z-index
       let arr = Array.from(document.querySelectorAll(".w-e-menu"));
-      arr.forEach((item) => {
+      arr.forEach(item => {
         item.style.zIndex = "1";
       });
+    },
+
+    // 添加自定义标签
+    addDiyTag() {
+      this.tagsArr.push(`#${this.diyTag}#`);
+      this.radio = this.tagsArr.length - 1;
+      this.centerDialogVisible = false;
     },
   },
   watch: {
@@ -157,7 +220,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     // 如果未登录返回首页，提示用户登录
-    next((vm) => {
+    next(vm => {
       let isLogin = vm.$store.getters.getUserInfo.userInfo;
       isLogin
         ? true
@@ -185,6 +248,16 @@ export default {
       .post_title {
         font-size: 1.5rem;
         padding: 1rem 0;
+      }
+    }
+    // 文章标题选择
+    .tag_container {
+      .post_tag {
+        font-size: 1.5rem;
+        padding: 1rem 0;
+      }
+      .tag_item {
+        margin-bottom: 10px;
       }
     }
     #wangeditor {

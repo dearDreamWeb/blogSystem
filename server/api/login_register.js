@@ -93,4 +93,19 @@ module.exports = (router, crud) => {
                 res.json({ state: 0 });
             })
     })
+
+    /**
+     * 判断用户是否登录
+     */
+    router.get("/userIsLogin", (req, res) => {
+        if (req.session.userInfo) {
+            res.json({
+                status: 0
+            })
+        } else {
+            res.json({
+                status: 1
+            })
+        }
+    })
 }

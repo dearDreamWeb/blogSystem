@@ -92,10 +92,26 @@ export default {
   },
   methods: {
     // 初始化数据
-    initData() {
+    async initData() {
+      await this.initIsLogin();
       // 判断当注销过用户信息后不调用getUserInfo方法
       let userInfo = this.$store.getters.getUserInfo;
       userInfo.userInfo && this.getUserInfo();
+    },
+
+    // 是否登录
+    initIsLogin() {
+      return this.$axios({
+        method: "get",
+        url: "/userIsLogin",
+      })
+        .then(res => {
+          if (res.data.status !== 0) {
+            this.isLogin = false;
+            window.sessionStorage.removeItem("userInfo");
+          }
+        })
+        .catch(err => console.log(err));
     },
 
     // 搜索标签 如果当前路由在searchLink时，输入框里填充搜索的值
