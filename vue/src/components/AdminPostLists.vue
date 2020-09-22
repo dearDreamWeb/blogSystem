@@ -22,7 +22,11 @@
             >
             </el-option>
           </el-select>
-          <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="searchData"
+          ></el-button>
         </el-input>
       </div>
     </header>
@@ -50,7 +54,7 @@
         <!-- 发布时间 -->
         <el-table-column prop="user_createdTime" label="发布时间" width="180">
           <template slot-scope="scope">
-            {{ scope.row.user_createdTime | formaterrDate }}
+            {{ scope.row.post_createTime | formaterrDate }}
           </template>
         </el-table-column>
         <!-- 文章标题 -->
@@ -74,7 +78,11 @@
               @click="moreInfo(scope.row)"
               >详情</el-button
             >
-            <el-button type="danger" icon="el-icon-delete" size="mini"
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="deletPost(scope.row, scope.$index)"
               >移除</el-button
             >
           </template>
@@ -94,7 +102,7 @@
         :total="pageData.total"
         :current-page="pageData.currentPage"
         :page-size="pageData.pageSize"
-        :page-sizes="[10, 30, 50, 100]"
+        :page-sizes="pageData.pageSizeArr"
         @current-change="changeCurrentPage"
         @size-change="handleSizeChange"
       >
@@ -137,7 +145,7 @@ export default {
         total: 100, // 总数据条数
       },
       dialogTableVisible: false, // 弹出框
-      tableData: [],
+      tableData: [], // 表格文章数据
     };
   },
   methods: {
@@ -209,7 +217,51 @@ export default {
         let postContent = this.$refs.post_content;
         postTitle.innerHTML = data.post_title;
         postContent.innerHTML = data.post_content;
+        let imgArr = postContent.querySelectorAll("img");
+        imgArr.forEach(item => {
+          item.style.maxWidth = window.getComputedStyle(postContent).width;
+        });
       });
+    },
+
+    /**
+     * 删除文章
+     */
+    deletPost(data, index) {
+      this.$confirm("永久删除该文章, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$axios({
+            method: "delete",
+            url: "/admin/deletPost",
+            params: {
+              post_id: data.post_id,
+            },
+          })
+            .then(res => {
+              if (res.data.status === 0) {
+                this.$message.success(res.data.mess);
+                this.tableData.splice(index, 1);
+              }
+            })
+            .catch(err => console.log(err));
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+
+    /**
+     * 搜索
+     */
+    searchData() {
+      this.ininTableData();
     },
   },
   filters: {
@@ -244,7 +296,6 @@ export default {
       padding-bottom: 20px;
     }
     .post_content {
-      height: 50vh;
       line-height: 2;
       overflow-x: hidden;
     }
