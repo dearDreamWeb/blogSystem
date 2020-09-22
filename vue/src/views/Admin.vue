@@ -122,6 +122,11 @@ export default {
               title: "文章列表",
               path: "/admin/post_lists",
             },
+            {
+              index: "2-2",
+              title: "评论列表",
+              path: "/admin/comments_lists",
+            },
           ],
         },
         {

@@ -9,6 +9,7 @@ const AdminLogin = () => import("@/views/AdminLogin.vue");
 const Admin = () => import("@/views/Admin.vue");
 const AdminHome = () => import("@/components/AdminHome.vue");
 const AdminPostLists = () => import("@/components/AdminPostLists.vue");
+const AdminCommentsLists = () => import("@/components/AdminCommentsLists.vue");
 
 
 Vue.use(VueRouter);
@@ -65,6 +66,11 @@ const routes = [
         path: "post_lists",
         name: "adminPostLists",
         component: AdminPostLists,
+      },
+      {
+        path: "comments_lists",
+        name: "adminCommentsLists",
+        component: AdminCommentsLists,
       },
       {
         path: "users",

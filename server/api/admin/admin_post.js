@@ -4,7 +4,7 @@ module.exports = (router, crud) => {
      * selectedValue 为0时，文章按ID查询；为1时，按文章标题或内容查询；为2时，按作者查询；为3时，按文章标签查询
      */
     router.get("/admin/postLists", (req, res) => {
-        let sort_orderBy = req.query.sort_orderBy === 1 ? "ASC" : "DESC";
+        let sort_orderBy = req.query.sort_orderBy === "1" ? "ASC" : "DESC";
         let {
             selectedValue,  // 搜索类型
             keyWord,       // 搜索的关键字

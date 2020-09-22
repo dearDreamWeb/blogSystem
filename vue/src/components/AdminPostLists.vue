@@ -36,6 +36,7 @@
         stripe
         border
         lazy
+        @sort-change="changeSort"
         :header-cell-style="{ backgroundColor: '#157dcf', color: '#fff' }"
         style="width: 100%"
       >
@@ -52,7 +53,12 @@
           </template>
         </el-table-column>
         <!-- 发布时间 -->
-        <el-table-column prop="user_createdTime" label="发布时间" width="180">
+        <el-table-column
+          prop="user_createdTime"
+          sortable="custom"
+          label="发布时间"
+          width="180"
+        >
           <template slot-scope="scope">
             {{ scope.row.post_createTime | formaterrDate }}
           </template>
@@ -145,6 +151,7 @@ export default {
         total: 100, // 总数据条数
       },
       dialogTableVisible: false, // 弹出框
+      sort_orderBy: 0, //排列顺序 0代表desc；1代表asc
       tableData: [], // 表格文章数据
     };
   },
@@ -161,7 +168,7 @@ export default {
           keyWord: this.keyWord,
           currentPage: this.pageData.currentPage,
           pageSize: this.pageData.pageSize,
-          orderBy: 0,
+          sort_orderBy: this.sort_orderBy,
         },
       })
         .then(res => {
@@ -261,6 +268,18 @@ export default {
      * 搜索
      */
     searchData() {
+      this.ininTableData();
+    },
+    /**
+     * 时间排序
+     */
+    changeSort(data) {
+      console.log(data.order)
+      if (data.order === "ascending") {
+        this.sort_orderBy = 1;
+      } else {
+        this.sort_orderBy = 0;
+      }
       this.ininTableData();
     },
   },
