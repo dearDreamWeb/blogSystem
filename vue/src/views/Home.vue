@@ -231,13 +231,14 @@ export default {
     },
 
     // 当页码改变时，重新请求数据
-    changeCurrentPage(val) {
+    async changeCurrentPage(val) {
       this.currentPage = val;
       this.$emit("changePageData", {
         currentPage: this.currentPage,
         pageSize: this.pageSize,
       });
-      this.initData(this.$route.params.content);
+      await this.initData(this.$route.params.content);
+      this.content();
     },
   },
   watch: {

@@ -92,7 +92,7 @@
           </el-breadcrumb>
           <!-- 子路由 -->
           <div class="view_wrap">
-            <router-view @adminUsername="adminUsername"></router-view>
+            <router-view :adminUsername="adminUsername"></router-view>
           </div>
         </el-main>
       </el-container>
@@ -114,7 +114,7 @@ export default {
         },
         {
           index: "2",
-          title: "文章",
+          title: "内容系统",
           icon: "el-icon-files",
           subnav: [
             {
@@ -126,7 +126,7 @@ export default {
         },
         {
           index: "3",
-          title: "用户",
+          title: "用户系统",
           icon: "el-icon-user",
           subnav: [
             {
@@ -303,7 +303,7 @@ export default {
       background-color: $bgColor;
       height: calc(100vh - 60px);
       .breadcrumb_wrap {
-        padding: 10px 20px;
+        padding: 20px 20px;
         background-color: $div_bgColor;
         border-bottom: $border_bottom;
       }

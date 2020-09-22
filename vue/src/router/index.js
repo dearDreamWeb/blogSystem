@@ -8,6 +8,7 @@ const Post = () => import("@/views/Post.vue");
 const AdminLogin = () => import("@/views/AdminLogin.vue");
 const Admin = () => import("@/views/Admin.vue");
 const AdminHome = () => import("@/components/AdminHome.vue");
+const AdminPostLists = () => import("@/components/AdminPostLists.vue");
 
 
 Vue.use(VueRouter);
@@ -63,7 +64,7 @@ const routes = [
       {
         path: "post_lists",
         name: "adminPostLists",
-        component: AdminHome,
+        component: AdminPostLists,
       },
       {
         path: "users",
