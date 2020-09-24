@@ -30,70 +30,131 @@
         </el-input>
       </div>
     </header>
+    <!-- 主体部分 -->
     <main class="main">
-      <el-table
-        :data="tableData"
-        stripe
-        border
-        lazy
-        @sort-change="changeSort"
-        :header-cell-style="{ backgroundColor: '#157dcf', color: '#fff' }"
-        style="width: 100%"
-      >
-        <!-- 文章ID -->
-        <el-table-column prop="post_id" label="文章ID" width="180">
-        </el-table-column>
-        <!-- 作者 -->
-        <el-table-column prop="user_nickName" label="作者" width="180">
-        </el-table-column>
-        <!-- 文章标签 -->
-        <el-table-column prop="post_tag" label="文章标签" width="180">
-          <template slot-scope="scope">
-            <el-tag size="medium">{{ scope.row.post_tag }}</el-tag>
-          </template>
-        </el-table-column>
-        <!-- 发布时间 -->
-        <el-table-column
-          prop="user_createdTime"
-          sortable="custom"
-          label="发布时间"
-          width="180"
+      <!-- 文章表格 -->
+      <div class="postTable" v-if="pathType === 0">
+        <el-table
+          :data="tableData"
+          stripe
+          border
+          lazy
+          @sort-change="changeSort"
+          :header-cell-style="{ backgroundColor: '#157dcf', color: '#fff' }"
+          style="width: 100%"
         >
-          <template slot-scope="scope">
-            {{ scope.row.post_createTime | formaterrDate }}
-          </template>
-        </el-table-column>
-        <!-- 文章标题 -->
-        <el-table-column prop="post_title" label="文章标题" width="250">
-        </el-table-column>
-        <!-- 文章内容 -->
-        <el-table-column
-          prop="post_title"
-          label="文章内容"
-          width="250"
-          :formatter="formatterContent"
+          <!-- 文章ID -->
+          <el-table-column prop="post_id" label="文章ID" width="180">
+          </el-table-column>
+          <!-- 作者 -->
+          <el-table-column prop="user_nickName" label="作者" width="180">
+          </el-table-column>
+          <!-- 文章标签 -->
+          <el-table-column prop="post_tag" label="文章标签" width="180">
+            <template slot-scope="scope">
+              <el-tag size="medium">{{ scope.row.post_tag }}</el-tag>
+            </template>
+          </el-table-column>
+          <!-- 发布时间 -->
+          <el-table-column
+            prop="post_createTime"
+            sortable="custom"
+            label="发布时间"
+            width="180"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.post_createTime | formaterrDate }}
+            </template>
+          </el-table-column>
+          <!-- 文章标题 -->
+          <el-table-column prop="post_title" label="文章标题" width="250">
+          </el-table-column>
+          <!-- 文章内容 -->
+          <el-table-column
+            prop="post_title"
+            label="文章内容"
+            width="250"
+            :formatter="formatterContent"
+          >
+          </el-table-column>
+          <!-- 操作 -->
+          <el-table-column fixed="right" label="操作" width="180">
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                icon="el-icon-more"
+                size="mini"
+                @click="moreInfo(scope.row)"
+                >详情</el-button
+              >
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                @click="deletPost(scope.row, scope.$index)"
+                >移除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <!-- 评论表格 -->
+      <div class="commentsTable" v-else>
+        <el-table
+          :data="tableData"
+          stripe
+          border
+          lazy
+          @sort-change="changeSort"
+          :header-cell-style="{ backgroundColor: '#157dcf', color: '#fff' }"
+          style="width: 100%"
         >
-        </el-table-column>
-        <!-- 操作 -->
-        <el-table-column fixed="right" label="操作" width="180">
-          <template slot-scope="scope">
-            <el-button
-              type="primary"
-              icon="el-icon-more"
-              size="mini"
-              @click="moreInfo(scope.row)"
-              >详情</el-button
-            >
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-              @click="deletPost(scope.row, scope.$index)"
-              >移除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
+          <!-- 评论ID -->
+          <el-table-column prop="comment_id" label="评论ID" width="180">
+          </el-table-column>
+          <!-- 评论者 -->
+          <el-table-column prop="user_nickName" label="评论者" width="180">
+          </el-table-column>
+          <!-- 评论内容 -->
+          <el-table-column prop="comment_content" label="评论内容" width="300">
+            <template slot-scope="scope">
+              {{ formatterCommentContent(scope.row.comment_content) }}
+            </template>
+          </el-table-column>
+          <!-- 评论时间 -->
+          <el-table-column
+            prop="comment_createTime"
+            sortable="custom"
+            label="评论时间"
+            width="180"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.comment_createTime | formaterrDate }}
+            </template>
+          </el-table-column>
+
+          <!-- 操作 -->
+          <el-table-column label="操作" width="180">
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                icon="el-icon-more"
+                size="mini"
+                @click="moreInfo(scope.row)"
+                >详情</el-button>
+
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                @click="deletPost(scope.row, scope.$index)"
+                >移除</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <!-- 详情弹出窗 -->
       <el-dialog title="文章详情" :visible.sync="dialogTableVisible">
         <h2 class="post_title" ref="post_title"></h2>
@@ -122,24 +183,8 @@ import moment from "moment";
 export default {
   data() {
     return {
-      options: [
-        {
-          value: 0,
-          label: "按文章ID查询",
-        },
-        {
-          value: 1,
-          label: "按文章标题或内容查询",
-        },
-        {
-          value: 2,
-          label: "按作者查询",
-        },
-        {
-          value: 3,
-          label: "按文章标签查询",
-        },
-      ],
+      pathType: 0, // 为0时，说明是文章列表界面，adminPostLists；为1时，说明是评论列表界面，adminCommentsLists
+      options: [],
       selectedValue: 0,
       keyWord: "",
       postConetentLen: 15, // 文章内容截取的长度
@@ -148,7 +193,7 @@ export default {
         currentPage: 1, // 当前页
         pageSize: 10, // 当前每页多少条数据
         pageSizeArr: [10, 30, 50, 100], // 每天条数的选择
-        total: 100, // 总数据条数
+        total: 0, // 总数据条数
       },
       dialogTableVisible: false, // 弹出框
       sort_orderBy: 0, //排列顺序 0代表desc；1代表asc
@@ -157,12 +202,59 @@ export default {
   },
   methods: {
     /**
+     * 初始化选项options
+     */
+    initOptions() {
+      switch (this.pathType) {
+        case 0:
+          this.options = [
+            {
+              value: 0,
+              label: "按文章ID查询",
+            },
+            {
+              value: 1,
+              label: "按文章标题或内容查询",
+            },
+            {
+              value: 2,
+              label: "按作者查询",
+            },
+            {
+              value: 3,
+              label: "按文章标签查询",
+            },
+          ];
+          break;
+        case 1:
+          this.options = [
+            {
+              value: 0,
+              label: "按评论ID查询",
+            },
+            {
+              value: 1,
+              label: "按评论内容查询",
+            },
+            {
+              value: 2,
+              label: "按评论者查询",
+            },
+          ];
+          break;
+      }
+    },
+
+    /**
      * 初始化tableData数据
      */
     ininTableData() {
+      this.tableData = [];
+      let url =
+        this.pathType === 0 ? "/admin/postLists" : "/admin/commentsLists";
       this.$axios({
         method: "get",
-        url: "/admin/postLists",
+        url: url,
         params: {
           selectedValue: this.selectedValue,
           keyWord: this.keyWord,
@@ -274,7 +366,6 @@ export default {
      * 时间排序
      */
     changeSort(data) {
-      console.log(data.order)
       if (data.order === "ascending") {
         this.sort_orderBy = 1;
       } else {
@@ -282,15 +373,43 @@ export default {
       }
       this.ininTableData();
     },
+
+    // 格式化评论的长度
+    formatterCommentContent(val) {
+      if (val.length > this.postConetentLen) {
+        return val.slice(0, this.postConetentLen) + "...";
+      } else {
+        return val;
+      }
+    },
   },
+  computed: {},
   filters: {
     // 格式化文章发布时间
     formaterrDate(val) {
       return moment(new Date(val)).format("YYYY-MM-DD HH:mm:ss");
     },
   },
+  watch: {
+    pathType() {
+      this.initOptions();
+      this.ininTableData();
+    },
+  },
   mounted() {
-    this.ininTableData();
+    this.$nextTick(() => {
+      this.initOptions();
+      this.ininTableData();
+    });
+  },
+  beforeRouteEnter(to, from, next) {
+    // 当进入不同的路由，改变pathType
+    if (to.name === "adminPostLists") {
+      next(vm => (vm.pathType = 0));
+    } else if (to.name === "adminCommentsLists") {
+      next(vm => (vm.pathType = 1));
+    }
+    next();
   },
 };
 </script>

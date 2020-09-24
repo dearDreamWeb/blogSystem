@@ -15,9 +15,10 @@ import Header from "./components/Header";
 export default {
   data() {
     return {
+      imgSrc: "",
       isReload: true,
       showHeader: true,
-      postTag: "",  // 要搜索的文章标签
+      postTag: "", // 要搜索的文章标签
     };
   },
   provide() {
