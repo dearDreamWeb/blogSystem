@@ -8,8 +8,8 @@ const Post = () => import("@/views/Post.vue");
 const AdminLogin = () => import("@/views/AdminLogin.vue");
 const Admin = () => import("@/views/Admin.vue");
 const AdminHome = () => import("@/components/AdminHome.vue");
-const AdminPostLists = () => import("@/components/AdminPostLists.vue");
-// const AdminCommentsLists = () => import("@/components/AdminCommentsLists.vue");
+const AdminTablePage = () => import("@/components/AdminTablePage.vue");
+
 
 
 Vue.use(VueRouter);
@@ -57,26 +57,31 @@ const routes = [
     component: Admin,
     redirect: "/admin/home",
     children: [
+      // 首页
       {
         path: "home",
         name: "adminHome",
         component: AdminHome,
       },
+      // 文章列表
       {
         path: "post_lists",
         name: "adminPostLists",
-        component: AdminPostLists,
+        component: AdminTablePage,
       },
+      // 评论列表
       {
         path: "comments_lists",
         name: "adminCommentsLists",
-        component: AdminPostLists,
+        component: AdminTablePage,
       },
+      // 网站用户
       {
         path: "users",
         name: "users",
         component: AdminHome,
       },
+      // 网站管理员
       {
         path: "admin_users",
         name: "adminUsers",

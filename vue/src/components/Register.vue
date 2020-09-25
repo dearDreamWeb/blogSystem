@@ -14,7 +14,7 @@
         class="demo-ruleForm"
         label-position="top"
       >
-        <el-form-item label="用户名" prop="name">
+        <el-form-item label="用户名" prop="name" :error="errors.errorName">
           <el-input v-model="ruleForm.name"></el-input>
         </el-form-item>
 
@@ -29,7 +29,11 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="昵称" prop="nickName">
+        <el-form-item
+          label="昵称"
+          prop="nickName"
+          :error="errors.errorNickName"
+        >
           <el-input v-model="ruleForm.nickName"></el-input>
         </el-form-item>
 
@@ -162,9 +166,7 @@ export default {
         return callback(new Error("昵称不能有特殊符号"));
       } else if (!regNickName.test(value)) {
         return callback(
-          new Error(
-            "昵称长度必须是3到9个字符，只能包含英文、中文、数字和_@、"
-          )
+          new Error("昵称长度必须是3到9个字符，只能包含英文、中文、数字和_@、")
         );
       } else {
         callback();
@@ -209,6 +211,10 @@ export default {
       }
     };
     return {
+      errors: {
+        errorName: "",
+        errorNickName: "",
+      },
       ruleForm: {
         name: "",
         password: "",
@@ -220,7 +226,7 @@ export default {
         address: "",
         imageUrl: "",
         confirmCode: "",
-        nowConfirmCode: ""
+        nowConfirmCode: "",
       },
       cities: [],
       isRefresh: false, // 是否刷新canvas验证码
@@ -229,78 +235,78 @@ export default {
           {
             required: true,
             validator: validateName,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             validator: validatePassword,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         confirmPassword: [
           {
             required: true,
             validator: validateConfirmPassword,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         nickName: [
           {
             required: true,
             validator: validateNickName,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         sex: [
           {
             required: true,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         email: [
           {
             required: true,
             validator: validateEmail,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         birthday: [
           {
             required: true,
             validator: validateBirthday,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         address: [
           {
             required: true,
             validator: validateAddress,
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         avatar: [
           {
             required: true,
             validator: validateAvatar,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         confirmCode: [
           {
             required: true,
             validator: validateConfirmCode,
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   props: {
     registerVisible: {
-      type: Boolean
-    }
+      type: Boolean,
+    },
   },
   methods: {
     /**
@@ -310,7 +316,7 @@ export default {
 
     handleClose() {
       this.$confirm("关闭后数据将会清空, 是否继续?", "提示", {
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
           this.$emit("changeRegisterVisible", false);
@@ -325,7 +331,7 @@ export default {
     init() {
       this.$axios({
         method: "get",
-        url: "/getCities"
+        url: "/getCities",
       })
         .then(res => {
           if (res.data.state === 0) {
@@ -346,21 +352,25 @@ export default {
       this.$nextTick(() => {
         this.$refs[formName].validate(valid => {
           if (valid) {
+            this.errors.errorName = "";
+            this.errors.errorNickName = "";
             this.$axios({
               method: "get",
               url: "/register",
               params: {
-                ruleForm: this.ruleForm
-              }
+                ruleForm: this.ruleForm,
+              },
             })
               .then(res => {
-                if (res.data.state === 0) {
+                if (res.data.status === 0) {
                   this.$message.success("注册成功");
                   this.$refs["ruleForm"].resetFields();
                   this.ruleForm.imageUrl = "";
                   this.$emit("changeRegisterVisible", false);
-                } else if (res.data.state === 1) {
-                  this.$message.success("用户名已存在，注册失败");
+                } else if (res.data.status === 1) {
+                  this.$message.error("请输入正确信息");
+                  this.errors.errorName = res.data.errorArr[0];
+                  this.errors.errorNickName = res.data.errorArr[1];
                 }
               })
               .catch(() => {
@@ -399,20 +409,20 @@ export default {
     // 验证码正确的值
     nowVal(val) {
       this.ruleForm.nowConfirmCode = val;
-    }
+    },
   },
   watch: {
     // 监听registerVisible，当为true时，显示模态框时，改变isRefresh，让canvas组件刷新验证码
     registerVisible(val) {
       this.isRefresh = val;
-    }
+    },
   },
   mounted() {
     this.init();
   },
   components: {
-    vCanvas: Canvas
-  }
+    vCanvas: Canvas,
+  },
 };
 </script>
 

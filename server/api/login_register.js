@@ -31,14 +31,26 @@ module.exports = (router, crud) => {
             user_nickName: jsonDatas.nickName,
             user_createdTime: moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
         }
-        crud("SELECT * FROM `users` WHERE user_name =?", [jsonDatas.name], data => {
+        crud("SELECT * FROM `users` WHERE user_name =? OR user_nickName =?", [objDatas.user_name, objDatas.user_nickName], data => {
             // 判断用户名是否已被注册，若已注册，返回{state:1}
             if (data.length > 0) {
-                res.json({ state: 1 })
+                let errorArr = [];
+                crud("SELECT * FROM `users` WHERE user_name =?", [objDatas.user_name], data1 => {
+                    if (data1.length > 0) {
+                        errorArr[0] = "用户已存在";
+                    }
+                    crud("SELECT * FROM `users` WHERE user_nickName =?", [objDatas.user_nickName], data2 => {
+                        if (data2.length > 0) {
+                            errorArr[1] = "昵称已存在";
+                        }
+                        res.json({ status: 1, errorArr })
+                    })
+                })
+
             } else {
                 // 用户名未被注册，插入数据
-                crud("INSERT INTO `users` SET ?", objDatas, data => {
-                    res.json({ state: 0 });
+                crud("INSERT INTO `users` SET ?", objDatas, () => {
+                    res.json({ status: 0 });
                 })
             }
         })
