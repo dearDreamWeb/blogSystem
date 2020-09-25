@@ -68,6 +68,9 @@
           </el-table-column>
           <!-- 文章标题 -->
           <el-table-column prop="post_title" label="文章标题" width="250">
+            <template slot-scope="scope">
+              {{ scope.row.post_title }}
+            </template>
           </el-table-column>
           <!-- 文章内容 -->
           <el-table-column
@@ -133,22 +136,22 @@
               {{ scope.row.comment_createTime | formaterrDate }}
             </template>
           </el-table-column>
-
           <!-- 操作 -->
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="180" v-if="pathType === 1">
             <template slot-scope="scope">
               <el-button
                 type="primary"
                 icon="el-icon-more"
                 size="mini"
                 @click="moreInfo(scope.row)"
-                >详情</el-button>
+                >详情</el-button
+              >
 
               <el-button
                 type="danger"
                 icon="el-icon-delete"
                 size="mini"
-                @click="deletPost(scope.row, scope.$index)"
+                @click.native="deletPost(scope.row, scope.$index)"
                 >移除</el-button
               >
             </template>
@@ -156,7 +159,10 @@
         </el-table>
       </div>
       <!-- 详情弹出窗 -->
-      <el-dialog title="文章详情" :visible.sync="dialogTableVisible">
+      <el-dialog
+        :title="pathType === 0 ? '文章详情' : '评论详情'"
+        :visible.sync="dialogTableVisible"
+      >
         <h2 class="post_title" ref="post_title"></h2>
         <section class="post_content" ref="post_content"></section>
       </el-dialog>
@@ -300,6 +306,7 @@ export default {
     formatterContent(data) {
       return (
         data.post_content
+          .toString()
           .replace(/<[^>]+>|&[^>]+;/g, "")
           .slice(0, this.postConetentLen) + "..."
       );
@@ -309,13 +316,22 @@ export default {
      * 详情
      */
     moreInfo(data) {
+      let title;
+      let content;
+      if (this.pathType === 0) {
+        title = data.post_title;
+        content = data.post_content;
+      } else {
+        title = "";
+        content = data.comment_content;
+      }
       this.dialogTableVisible = true;
       this.morePostInfo = data;
       this.$nextTick(() => {
         let postTitle = this.$refs.post_title;
         let postContent = this.$refs.post_content;
-        postTitle.innerHTML = data.post_title;
-        postContent.innerHTML = data.post_content;
+        postTitle.innerHTML = title;
+        postContent.innerHTML = content;
         let imgArr = postContent.querySelectorAll("img");
         imgArr.forEach(item => {
           item.style.maxWidth = window.getComputedStyle(postContent).width;
@@ -327,6 +343,15 @@ export default {
      * 删除文章
      */
     deletPost(data, index) {
+      // url
+      let url =
+        this.pathType === 0 ? "/admin/deletPost" : "/admin/deletComment";
+      // 参数
+      let params =
+        this.pathType === 0
+          ? { post_id: data.post_id }
+          : { comment_id: data.comment_id };
+      // 确认框
       this.$confirm("永久删除该文章, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -335,15 +360,14 @@ export default {
         .then(() => {
           this.$axios({
             method: "delete",
-            url: "/admin/deletPost",
-            params: {
-              post_id: data.post_id,
-            },
+            url,
+            params,
           })
             .then(res => {
               if (res.data.status === 0) {
                 this.$message.success(res.data.mess);
                 this.tableData.splice(index, 1);
+                this.pageData.total--;
               }
             })
             .catch(err => console.log(err));
@@ -376,14 +400,13 @@ export default {
 
     // 格式化评论的长度
     formatterCommentContent(val) {
-      if (val.length > this.postConetentLen) {
+      if (val && val.length > this.postConetentLen) {
         return val.slice(0, this.postConetentLen) + "...";
       } else {
         return val;
       }
     },
   },
-  computed: {},
   filters: {
     // 格式化文章发布时间
     formaterrDate(val) {

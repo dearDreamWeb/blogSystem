@@ -21,6 +21,7 @@
               v-model="ruleForm.username"
               autocomplete="off"
               placeholder="请输入管理员账号"
+              autofocus="true"
             ></el-input>
           </el-form-item>
           <!-- 管理员密码 -->
