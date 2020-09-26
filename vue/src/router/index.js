@@ -9,6 +9,7 @@ const AdminLogin = () => import("@/views/AdminLogin.vue");
 const Admin = () => import("@/views/Admin.vue");
 const AdminHome = () => import("@/components/AdminHome.vue");
 const AdminTablePage = () => import("@/components/AdminTablePage.vue");
+const AdminUsers = () => import("@/components/AdminUsers.vue");
 
 
 
@@ -79,7 +80,7 @@ const routes = [
       {
         path: "users",
         name: "users",
-        component: AdminHome,
+        component: AdminUsers,
       },
       // 网站管理员
       {

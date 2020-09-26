@@ -5,4 +5,6 @@ module.exports = (router, crud) => {
     require("./admin_post")(router, crud);
     // 后台评论
     require("./admin_comments")(router, crud);
+    // 后台用户
+    require("./admin_users")(router, crud);
 }

@@ -5,10 +5,18 @@ module.exports = (router, crud) => {
         crud("SELECT * FROM `users` WHERE user_name=? AND user_password=?",
             [req.query.userName, req.query.userPassword], data => {
                 if (data.length > 0) {
-                    req.session.userInfo = data[0];
-                    res.json({ state: 0, user_id: req.session.userInfo.user_id });
+                    if (data[0].user_isFreeze === 0) {
+                        req.session.userInfo = data[0];
+                        res.json({ status: 0, user_id: req.session.userInfo.user_id });
+                    }else {
+                        // 代表该账号已冻结
+                        res.json({
+                            status:2,
+                        })
+                    }
+
                 } else {
-                    res.json({ state: 1 });
+                    res.json({ status: 1 });
                 }
             })
     });

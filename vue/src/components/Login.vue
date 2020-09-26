@@ -145,14 +145,14 @@ export default {
           // 清空form表单的值
           this.$refs["ruleForm"].resetFields();
         })
-        .catch((err) => console.log(err));
+        .catch(err => console.log(err));
     },
 
     /**
      *提交
      */
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           this.$axios({
             method: "get",
@@ -162,22 +162,50 @@ export default {
               userPassword: this.ruleForm.password,
             },
           })
-            .then((res) => {
-              if (res.data.state === 0) {
-                this.$message.success("登录成功");
-                this.$refs["ruleForm"].resetFields();
-                // 向vuex中传入登录成功的用户的id
-                this.$store.commit("setUserInfo", res.data.user_id);
-                this.$emit("userIsLogin");
-                this.$emit("changeLoginVisible", false);
-                this.$router.push({ name: "homeLink" }).catch(() => {
-                  window.location.reload();
-                });
-              } else if (res.data.state === 1) {
-                this.$message.error("用户名或密码错误");
+            .then(res => {
+              switch (res.data.status) {
+                case 0:
+                  this.$message.success("登录成功");
+                  this.$refs["ruleForm"].resetFields();
+                  // 向vuex中传入登录成功的用户的id
+                  this.$store.commit("setUserInfo", res.data.user_id);
+                  this.$emit("userIsLogin");
+                  this.$emit("changeLoginVisible", false);
+                  this.$router.push({ name: "homeLink" }).catch(() => {
+                    window.location.reload();
+                  });
+                  break;
+                case 1:
+                  this.$message.error("用户名或密码错误");
+                  break;
+                case 2:
+                  this.$alert(
+                    "该账号已被冻结，请添加微信客服：web2020_",
+                    "提示",
+                    {
+                      confirmButtonText: "确定",
+                      type: "warning",
+                    }
+                  );
+                  break;
+                default:
+                  break;
               }
+              // if (res.data.status === 0) {
+              //   this.$message.success("登录成功");
+              //   this.$refs["ruleForm"].resetFields();
+              //   // 向vuex中传入登录成功的用户的id
+              //   this.$store.commit("setUserInfo", res.data.user_id);
+              //   this.$emit("userIsLogin");
+              //   this.$emit("changeLoginVisible", false);
+              //   this.$router.push({ name: "homeLink" }).catch(() => {
+              //     window.location.reload();
+              //   });
+              // } else if (res.data.status === 1) {
+              //   this.$message.error("用户名或密码错误");
+              // }
             })
-            .catch((err) => {
+            .catch(err => {
               console.log(err);
             });
         } else {

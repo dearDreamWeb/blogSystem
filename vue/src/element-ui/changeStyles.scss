@@ -40,7 +40,7 @@
 .el-menu--collapse {
   .el-submenu {
     .el-submenu__title {
-      span{
+      span {
         display: none;
       }
       .el-submenu__icon-arrow.el-icon-arrow-right {
@@ -48,4 +48,16 @@
       }
     }
   }
+}
+// 修改男性和女性图标颜色
+.el-icon-female,
+.el-icon-male {
+  font-size: 18px;
+  font-weight: bold;
+}
+.el-icon-female {
+  color: $jd_color;
+}
+.el-icon-male {
+  color: $blue;
 }
