@@ -30,7 +30,7 @@
               type="password"
               v-model="ruleForm.pass"
               autocomplete="off"
-              prefix-icon="el-icon-s-tools"
+              prefix-icon="el-icon-lock"
               placeholder="请输入管理员密码"
               @keydown.enter.native="submitForm('ruleForm')"
             ></el-input>
@@ -82,7 +82,6 @@ export default {
     };
   },
   methods: {
-
     // 表单提交
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -97,9 +96,9 @@ export default {
           })
             .then(res => {
               if (res.data.status === 0) {
-                this.$store.commit("setAdminUsername",res.data.adminUsername);
+                this.$store.commit("setAdminUsername", res.data.adminUsername);
                 this.$message.success(res.data.message);
-                this.$router.push("/admin")
+                this.$router.push("/admin");
               } else {
                 this.$message.warning(res.data.message);
               }
@@ -111,6 +110,16 @@ export default {
         }
       });
     },
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      let adminUsername = vm.$store.getters.getAdminUsername;
+      if (adminUsername) {
+        vm.$message.info("管理员已登录");
+        vm.$router.push("/admin");
+        return false;
+      }
+    });
   },
 };
 </script>
