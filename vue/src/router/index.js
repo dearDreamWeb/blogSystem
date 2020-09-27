@@ -10,6 +10,7 @@ const Admin = () => import("@/views/Admin.vue");
 const AdminHome = () => import("@/components/AdminHome.vue");
 const AdminTablePage = () => import("@/components/AdminTablePage.vue");
 const AdminUsers = () => import("@/components/AdminUsers.vue");
+const AdminAdminUsers = () => import("@/components/AdminAdminUsers.vue");
 
 
 
@@ -86,7 +87,7 @@ const routes = [
       {
         path: "admin_users",
         name: "adminUsers",
-        component: AdminHome,
+        component: AdminAdminUsers,
       }]
   },
   // 404

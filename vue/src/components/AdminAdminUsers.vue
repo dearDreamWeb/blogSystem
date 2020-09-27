@@ -17,7 +17,7 @@
         </el-date-picker>
         <!-- 输入关键字 -->
         <el-input
-          placeholder="请输入用户ID或昵称"
+          placeholder="请输入用户ID或用户名"
           v-model="keyWord"
           class="input-with-select"
           clearable
@@ -32,11 +32,17 @@
     </header>
     <!-- 主体部分 -->
     <main class="main">
-      <el-radio-group v-model="radio">
-        <el-radio :label="2">全部用户</el-radio>
-        <el-radio :label="0">正常用户</el-radio>
-        <el-radio :label="1">冻结用户</el-radio>
-      </el-radio-group>
+      <el-button
+        type="success"
+        icon="el-icon-plus"
+        @click="
+          isSuperAdmin
+            ? addAdminUser()
+            : $message.warning('该操作仅支持超级管理员')
+        "
+        >添加管理员</el-button
+      >
+
       <!-- 用户表格 -->
       <div class="usersTable">
         <el-table
@@ -49,90 +55,38 @@
           style="width: 100%"
         >
           <!-- 用户ID -->
-          <el-table-column
-            fixed="left"
-            prop="user_id"
-            label="用户ID"
-            width="150"
-          >
-          </el-table-column>
+          <el-table-column fixed="left" prop="id" label="ID"> </el-table-column>
           <!-- 用户名 -->
-          <el-table-column prop="user_name" label="用户名" width="120">
-          </el-table-column>
-          <!-- 昵称 -->
-          <el-table-column prop="user_nickName" label="昵称" width="180">
-          </el-table-column>
+          <el-table-column prop="username" label="用户名"> </el-table-column>
           <!-- 加入时间 -->
           <el-table-column
-            prop="user_createdTime"
+            prop="created_time"
             sortable="custom"
             label="加入时间"
-            width="180"
           >
             <template slot-scope="scope">
-              {{ scope.row.user_createdTime | formaterrDate }}
+              {{ scope.row.created_time | formaterrDate }}
             </template>
           </el-table-column>
-          <!-- 性别 -->
-          <el-table-column prop="user_sex" label="性别" width="50">
+          <!-- 角色 -->
+          <el-table-column prop="category" label="角色">
             <template slot-scope="scope">
-              <i
-                :class="
-                  scope.row.user_sex === 0 ? 'el-icon-female' : 'el-icon-male'
-                "
-                :title="scope.row.user_sex === 0 ? '女' : '男'"
-              ></i>
+              {{ scope.row.category === 1 ? "超级管理员" : "普通管理员" }}
             </template>
-          </el-table-column>
-          <!-- 邮箱 -->
-          <el-table-column prop="user_email" label="邮箱" width="180">
-          </el-table-column>
-          <!-- 头像 -->
-          <el-table-column prop="user_avatar" label="头像" width="80">
-            <template slot-scope="scope">
-              <img :src="scope.row.user_avatar" alt="头像" class="avatar" />
-            </template>
-          </el-table-column>
-          <!-- 地址 -->
-          <el-table-column prop="user_address" label="地址" width="180">
-          </el-table-column>
-          <!-- 生日 -->
-          <el-table-column prop="user_birthday" label="生日" width="100">
           </el-table-column>
 
-          <!-- 状态 -->
-          <el-table-column
-            prop="user_isFreeze"
-            fixed="right"
-            label="状态"
-            width="80"
-          >
-            <template slot-scope="scope">
-              <el-tag
-                :type="scope.row.user_isFreeze === 0 ? 'success' : 'danger'"
-              >
-                {{ scope.row.user_isFreeze === 0 ? "正常" : "冻结" }}
-              </el-tag>
-            </template>
-          </el-table-column>
           <!-- 操作 -->
-          <el-table-column fixed="right" label="操作" width="150">
+          <el-table-column label="操作">
             <template slot-scope="scope">
-              <!-- 切换用户状态 -->
-              <i
-                :class="
-                  scope.row.user_isFreeze === 0
-                    ? 'el-icon-video-pause icon'
-                    : 'el-icon-video-play icon'
-                "
-                :title="scope.row.user_isFreeze === 0 ? '正常' : '冻结'"
-                @click="changeStatus(scope.row, scope.$index)"
-              ></i>
               <!-- 修改密码 -->
               <i
                 class="el-icon-unlock icon"
                 title="修改密码"
-                @click="changeUserPass(scope.row)"
+                @click="
+                  isSuperAdmin
+                    ? changeUserPass(scope.row)
+                    : $message.warning('该操作仅支持超级管理员')
+                "
               ></i>
               <!-- 删除 -->
               <i
@@ -148,18 +102,17 @@
           </el-table-column>
         </el-table>
       </div>
-      <!-- 详情弹出窗 -->
+      <!-- 修改密码弹出窗 -->
       <el-dialog
-        title="修改密码"
+        :title="editUserData.id ? '修改密码' : '添加管理员'"
         :visible.sync="dialogTableVisible"
         class="dialog"
         :before-close="handleClose"
       >
-        <!-- form 表单 -->
-        <div v-if="editUserData.user_id" class="form_wrap">
-          <p class="userInfo">用户ID：{{ editUserData.user_id }}</p>
-          <p class="userInfo">用户名：{{ editUserData.user_name }}</p>
-          <p class="userInfo">昵称：{{ editUserData.user_nickName }}</p>
+        <!-- 修改密码的form 表单 -->
+        <div v-if="editUserData.id" class="form_wrap">
+          <p class="userInfo">用户ID：{{ editUserData.id }}</p>
+          <p class="userInfo">用户名：{{ editUserData.username }}</p>
           <el-form
             label-position="top"
             label-width="80px"
@@ -192,6 +145,40 @@
             </el-form-item>
           </el-form>
         </div>
+        <!-- 添加新用户的form 表单 -->
+        <div v-else>
+          <el-form
+            label-position="top"
+            label-width="80px"
+            :model="newUserFormData"
+            status-icon
+            :rules="rules"
+            ref="ruleForm"
+          >
+            <el-form-item
+              label="用户名"
+              prop="adminUserName"
+              :error="errors.usernameError"
+            >
+              <el-input
+                type="text"
+                v-model="newUserFormData.adminUserName"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                type="password"
+                v-model="newUserFormData.password"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="checkPass">
+              <el-input
+                type="password"
+                v-model="newUserFormData.checkPass"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
         <footer slot="footer" class="dialog-footer">
           <el-button @click="dialogTableVisible = false">取 消</el-button>
           <el-button type="primary" @click="submitEditUserInfo('ruleForm')"
@@ -220,6 +207,7 @@
 <script>
 import moment from "moment";
 export default {
+  inject: ["reload"], //刷新页面
   props: {
     isSuperAdmin: {
       type: Boolean,
@@ -227,6 +215,22 @@ export default {
     },
   },
   data() {
+    //  用户名校验
+    let validateName = (rule, value, callback) => {
+      let regWord = /[`!#$%^&*@,.()_+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘、，|《。》？、【】[\] \u4e00-\u9fa5]/i;
+      let regName = /\w{3,9}/;
+      if (!value) {
+        return callback(new Error("用户名不能为空"));
+      } else if (regWord.test(value)) {
+        return callback(new Error("用户名不能有特殊符号或者中文"));
+      } else if (!regName.test(value)) {
+        return callback(
+          new Error("用户名长度必须是3到9个字符，只能包含英文和数字")
+        );
+      } else {
+        callback();
+      }
+    };
     // 校验新密码
     var validateNewPass = (rule, value, callback) => {
       let regWord = /[`!#$%^&*()_+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘、，|《。》？、【】[\] \u4e00-\u9fa5]/i;
@@ -247,9 +251,12 @@ export default {
     };
     // 校验确认密码
     var validateCheckNewPass = (rule, value, callback) => {
+      let password = this.editUserData.newPass
+        ? this.editUserData.newPass
+        : this.newUserFormData.password;
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value !== this.editUserData.newPass) {
+      } else if (value !== password) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
@@ -259,7 +266,7 @@ export default {
     return {
       dateVal: "", // 日期范围
       keyWord: "",
-      radio: 2, // 单选框的值
+      newUserFormData: {}, // 添加新用户的form表单数据
       editUserData: {}, // 要修改的用户信息
       // 分页中的数据
       pageData: {
@@ -308,10 +315,14 @@ export default {
         oldPass: [{ validator: validateNewPass, trigger: "blur" }],
         newPass: [{ validator: validateNewPass, trigger: "blur" }],
         checkNewPass: [{ validator: validateCheckNewPass, trigger: "blur" }],
+        adminUserName: [{ validator: validateName, trigger: "blur" }],
+        password: [{ validator: validateNewPass, trigger: "blur" }],
+        checkPass: [{ validator: validateCheckNewPass, trigger: "blur" }],
       },
       // form表单错误
       errors: {
-        oldPassError: "",
+        oldPassError: "", // 旧密码错误提示
+        usernameError: "", // 用户名错误提示
       },
     };
   },
@@ -323,9 +334,8 @@ export default {
       this.tableData = [];
       this.$axios({
         method: "get",
-        url: "/admin/usersLists",
+        url: "/admin/adminUsersLists",
         params: {
-          status: this.radio,
           dateVal: this.dateVal ? this.dateVal : "",
           keyWord: this.keyWord,
           currentPage: this.pageData.currentPage,
@@ -376,45 +386,6 @@ export default {
     },
 
     /**
-     * 改变用户的状态
-     */
-    changeStatus(data, index) {
-      // 通过user_isFreeze来决定要显示什么信息
-      let confirmMess =
-        data.user_isFreeze === 0 ? "冻结该用户" : "解除冻结，恢复正常";
-      let newStatus = data.user_isFreeze === 0 ? 1 : 0; // 要变成的状态
-      // 确认框
-      this.$confirm(`是否${confirmMess}?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          this.$axios({
-            method: "get",
-            url: "/admin/changeIsFreeze",
-            params: {
-              user_id: data.user_id,
-              newStatus,
-            },
-          })
-            .then(res => {
-              if (res.data.status === 0) {
-                this.tableData[index].user_isFreeze = newStatus;
-                this.$message.success("修改成功");
-              }
-            })
-            .catch(err => console.log(err));
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
-    },
-
-    /**
      * 点击编辑用户信息按钮
      */
     changeUserPass(data) {
@@ -427,16 +398,28 @@ export default {
      */
     submitEditUserInfo(formName) {
       this.errors.oldPassError = "";
+      this.errors.usernameError = "";
       this.$refs[formName].validate(valid => {
         if (valid) {
+          // url
+          let url = this.editUserData.id
+            ? "/admin/changeAdminUserPass"
+            : "/admin/addAdminUser";
+          // 参数data
+          let data = this.editUserData.id
+            ? {
+                adminUser_id: this.editUserData.id,
+                oldPass: this.editUserData.oldPass,
+                newPass: this.editUserData.newPass,
+              }
+            : {
+                username: this.newUserFormData.adminUserName,
+                password: this.newUserFormData.password,
+              };
           this.$axios({
             method: "post",
-            url: "/admin/editUserPass",
-            data: {
-              user_id: this.editUserData.user_id,
-              oldPass: this.editUserData.oldPass,
-              newPass: this.editUserData.newPass,
-            },
+            url,
+            data,
           })
             .then(res => {
               // res.data.status 为0时代表修改密码成功；为1时代表旧密码错误
@@ -444,10 +427,17 @@ export default {
                 case 0:
                   this.dialogTableVisible = false;
                   this.$refs[formName].resetFields();
-                  this.$message.success("修改密码成功");
+                  this.$message.success(res.data.mess);
+                  if (!this.editUserData.id) {
+                    this.reload();
+                  }
                   break;
                 case 1:
-                  this.errors.oldPassError = res.data.mess;
+                  if (this.editUserData.id) {
+                    this.errors.oldPassError = res.data.mess;
+                  } else {
+                    this.errors.usernameError = res.data.mess;
+                  }
                   break;
               }
             })
@@ -470,9 +460,9 @@ export default {
         .then(() => {
           this.$axios({
             method: "delete",
-            url: "/admin/deleteUser",
+            url: "/admin/deleteAdminUser",
             params: {
-              user_id: data.user_id,
+              adminUser_id: data.id,
             },
           })
             .then(res => {
@@ -502,6 +492,13 @@ export default {
         })
         .catch(() => {});
     },
+
+    /**
+     * 添加管理员按钮
+     */
+    addAdminUser() {
+      this.dialogTableVisible = true;
+    },
   },
   filters: {
     // 格式化文章发布时间
@@ -510,13 +507,12 @@ export default {
     },
   },
   watch: {
-    radio() {
-      this.ininTableData();
-    },
     // 当对话框隐藏时，清空表单数据
     dialogTableVisible(newVal) {
       if (newVal === false) {
         this.$refs["ruleForm"].resetFields();
+        this.editUserData = {};
+        this.newUserFormData = {};
       }
     },
   },

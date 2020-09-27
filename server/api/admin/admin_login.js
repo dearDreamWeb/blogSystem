@@ -23,10 +23,11 @@ module.exports = (router, crud) => {
     // 判断管理员是否登录
     router.get("/admin/isLogin", (req, res) => {
         if (req.session.adminInfo) {
-            let { username } = req.session.adminInfo;
+            let { username, category } = req.session.adminInfo;
             res.json({
                 status: 0,
-                adminUsername: username
+                adminUsername: username,
+                category: category === 1 ? true : false  // 为1是超级管理员，返回true
             })
         } else {
             res.json({

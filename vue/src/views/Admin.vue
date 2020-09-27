@@ -39,7 +39,6 @@
             :default-active="activeIndex"
             class="el-menu-vertical-demo"
             :collapse="isCollapse"
-            :unique-opened="true"
           >
             <div v-for="(item, index) in navData" :key="index">
               <!-- 
@@ -92,7 +91,10 @@
           </el-breadcrumb>
           <!-- 子路由 -->
           <div class="view_wrap">
-            <router-view :adminUsername="adminUsername"></router-view>
+            <router-view
+              :adminUsername="adminUsername"
+              :isSuperAdmin="isSuperAdmin"
+            ></router-view>
           </div>
         </el-main>
       </el-container>
@@ -149,7 +151,8 @@ export default {
       ],
       activeIndex: "1", // 当前访问的导航
       isCollapse: false, // 是否折叠左侧导航栏
-      adminUsername: "",
+      adminUsername: "", // 管理员名字
+      isSuperAdmin: false, // 是否是超级管理员
     };
   },
   methods: {
@@ -204,6 +207,7 @@ export default {
           if (res.data.status === 0) {
             this.$store.commit("setAdminUsername", res.data.adminUsername);
             this.adminUsername = res.data.adminUsername;
+            this.isSuperAdmin = res.data.category;
           } else {
             this.$message.info(res.data.mess);
             this.$router.push("/");
