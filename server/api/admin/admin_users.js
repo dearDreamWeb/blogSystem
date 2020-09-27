@@ -114,12 +114,23 @@ module.exports = (router, crud) => {
     /**
      * 删除用户
      */
-    router.delete("/admin/deletUser", (req, res) => {
-        let { comment_id } = req.query;
-        crud(`DELETE FROM ` + "`comment`" + ` WHERE comment_id=?`, [comment_id], () => {
-            res.json({
-                status: 0,
-                mess: "删除成功过"
+    router.delete("/admin/deleteUser", (req, res) => {
+        let { user_id } = req.query;
+
+        // 删除post表中的对应的数据
+        crud(`DELETE FROM ` + "`post`" + ` WHERE post_masterId=?`, [user_id], () => {
+            // 删除post_support表中的对应的数据
+            crud(`DELETE FROM ` + "`post_support`" + ` WHERE user_id=?`, [user_id], () => {
+                // 删除comment表中的对应的数据
+                crud(`DELETE FROM ` + "`comment`" + ` WHERE comment_masterId=?`, [user_id], () => {
+                    // 删除users表中的对应的数据
+                    crud(`DELETE FROM ` + "`users`" + ` WHERE user_id=?`, [user_id], () => {
+                        res.json({
+                            status: 0,
+                            mess: "删除成功"
+                        })
+                    })
+                })
             })
         })
     })

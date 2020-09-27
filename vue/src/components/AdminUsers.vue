@@ -135,7 +135,11 @@
                 @click="changeUserPass(scope.row)"
               ></i>
               <!-- 删除 -->
-              <i class="el-icon-delete icon" title="删除"></i>
+              <i
+                class="el-icon-delete icon"
+                title="删除"
+                @click="deleteUser(scope.row)"
+              ></i>
             </template>
           </el-table-column>
         </el-table>
@@ -145,6 +149,7 @@
         title="修改信息"
         :visible.sync="dialogTableVisible"
         class="dialog"
+        :before-close="handleClose"
       >
         <!-- form 表单 -->
         <div v-if="editUserData.user_id" class="form_wrap">
@@ -476,6 +481,49 @@ export default {
           }
         })
         .catch(err => console.log(err));
+    },
+
+    /**
+     * 删除用户
+     */
+    deleteUser(data) {
+      this.$confirm("此操作将永久删除该用户的所有记录, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$axios({
+            method: "delete",
+            url: "/admin/deleteUser",
+            params: {
+              user_id: data.user_id,
+            },
+          })
+            .then(res => {
+              if (res.data.status === 0) {
+                this.$message.success(res.data.mess);
+              }
+            })
+            .catch(err => console.log(err));
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+
+    /**
+     * 确认是否关闭对话框
+     */
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then(() => {
+          done();
+        })
+        .catch(() => {});
     },
   },
   filters: {
