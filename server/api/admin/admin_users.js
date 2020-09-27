@@ -80,12 +80,36 @@ module.exports = (router, crud) => {
      */
     router.get("/admin/changeIsFreeze", (req, res) => {
         let { user_id, newStatus } = req.query;
-        crud("UPDATE `users` SET `user_isFreeze` = ? WHERE user_id =?",[newStatus,user_id],()=>{
+        crud("UPDATE `users` SET `user_isFreeze` = ? WHERE user_id =?", [newStatus, user_id], () => {
             res.json({
-                status:0
+                status: 0
             })
         })
     })
+
+    /**
+     * 修改用户密码
+     */
+    router.post("/admin/editUserPass", (req, res) => {
+        let { user_id, oldPass, newPass } = req.body;
+        console.log(user_id);
+        crud("SELECT user_password FROM `users` WHERE `user_id`=? ", [user_id], data => {
+            if (data[0].user_password === oldPass) {
+                crud("UPDATE `users` SET `user_password` = ? WHERE user_id =?", [newPass, user_id], () => {
+                    res.json({
+                        status: 0
+                    })
+                })
+            } else {
+                res.json({
+                    status: 1,
+                    mess: "旧密码错误"
+                })
+            }
+        })
+
+    })
+
 
     /**
      * 删除用户

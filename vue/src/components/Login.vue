@@ -188,22 +188,7 @@ export default {
                     }
                   );
                   break;
-                default:
-                  break;
               }
-              // if (res.data.status === 0) {
-              //   this.$message.success("登录成功");
-              //   this.$refs["ruleForm"].resetFields();
-              //   // 向vuex中传入登录成功的用户的id
-              //   this.$store.commit("setUserInfo", res.data.user_id);
-              //   this.$emit("userIsLogin");
-              //   this.$emit("changeLoginVisible", false);
-              //   this.$router.push({ name: "homeLink" }).catch(() => {
-              //     window.location.reload();
-              //   });
-              // } else if (res.data.status === 1) {
-              //   this.$message.error("用户名或密码错误");
-              // }
             })
             .catch(err => {
               console.log(err);

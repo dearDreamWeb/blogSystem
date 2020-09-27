@@ -118,6 +118,7 @@
           <!-- 操作 -->
           <el-table-column fixed="right" label="操作" width="150">
             <template slot-scope="scope">
+              <!-- 切换用户状态 -->
               <i
                 :class="
                   scope.row.user_isFreeze === 0
@@ -127,16 +128,67 @@
                 :title="scope.row.user_isFreeze === 0 ? '正常' : '冻结'"
                 @click="changeStatus(scope.row, scope.$index)"
               ></i>
-              <i class="el-icon-edit icon" title="编辑"></i>
+              <!-- 修改密码 -->
+              <i
+                class="el-icon-setting icon"
+                title="修改密码"
+                @click="changeUserPass(scope.row)"
+              ></i>
+              <!-- 删除 -->
               <i class="el-icon-delete icon" title="删除"></i>
             </template>
           </el-table-column>
         </el-table>
       </div>
       <!-- 详情弹出窗 -->
-      <el-dialog title="文章详情" :visible.sync="dialogTableVisible">
-        <h2 class="post_title" ref="post_title"></h2>
-        <section class="post_content" ref="post_content"></section>
+      <el-dialog
+        title="修改信息"
+        :visible.sync="dialogTableVisible"
+        class="dialog"
+      >
+        <!-- form 表单 -->
+        <div v-if="editUserData.user_id" class="form_wrap">
+          <p class="userInfo">用户ID：{{ editUserData.user_id }}</p>
+          <p class="userInfo">用户名：{{ editUserData.user_name }}</p>
+          <p class="userInfo">昵称：{{ editUserData.user_nickName }}</p>
+          <el-form
+            label-position="top"
+            label-width="80px"
+            :model="editUserData"
+            status-icon
+            :rules="rules"
+            ref="ruleForm"
+          >
+            <el-form-item
+              label="旧密码"
+              prop="oldPass"
+              :error="errors.oldPassError"
+            >
+              <el-input
+                type="password"
+                v-model="editUserData.oldPass"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="新密码" prop="newPass">
+              <el-input
+                type="password"
+                v-model="editUserData.newPass"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="checkNewPass">
+              <el-input
+                type="password"
+                v-model="editUserData.checkNewPass"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <footer slot="footer" class="dialog-footer">
+          <el-button @click="dialogTableVisible = false">取 消</el-button>
+          <el-button type="primary" @click="submitEditUserInfo('ruleForm')"
+            >确 定</el-button
+          >
+        </footer>
       </el-dialog>
     </main>
     <!-- 底部分页 -->
@@ -160,10 +212,40 @@
 import moment from "moment";
 export default {
   data() {
+    // 校验新密码
+    var validateNewPass = (rule, value, callback) => {
+      let regWord = /[`!#$%^&*()_+<>?:"{}\\/;'[\]·！#￥（——）：；“”‘、，|《。》？、【】[\] \u4e00-\u9fa5]/i;
+      let regPassword = /[\w,.@]{3,16}/;
+      if (!value) {
+        return callback(new Error("密码不能为空"));
+      } else if (regWord.test(value)) {
+        return callback(new Error("密码不能有特殊符号或者中文"));
+      } else if (!regPassword.test(value)) {
+        return callback(
+          new Error(
+            "密码长度必须是3到16个字符，只能包含英文、数字和特殊字符@,."
+          )
+        );
+      } else {
+        callback();
+      }
+    };
+    // 校验确认密码
+    var validateCheckNewPass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.editUserData.newPass) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
+
     return {
       dateVal: "", // 日期范围
       keyWord: "",
       radio: 2, // 单选框的值
+      editUserData: {}, // 要修改的用户信息
       // 分页中的数据
       pageData: {
         currentPage: 1, // 当前页
@@ -205,6 +287,16 @@ export default {
             },
           },
         ],
+      },
+      // form表单规则
+      rules: {
+        oldPass: [{ validator: validateNewPass, trigger: "blur" }],
+        newPass: [{ validator: validateNewPass, trigger: "blur" }],
+        checkNewPass: [{ validator: validateCheckNewPass, trigger: "blur" }],
+      },
+      // form表单错误
+      errors: {
+        oldPassError: "",
       },
     };
   },
@@ -347,6 +439,44 @@ export default {
           });
         });
     },
+
+    /**
+     * 点击编辑用户信息按钮
+     */
+    changeUserPass(data) {
+      this.editUserData = data;
+      this.dialogTableVisible = true;
+    },
+
+    /**
+     * 提交编辑用户的信息
+     */
+    submitEditUserInfo(formName) {
+      this.errors.oldPassError = "";
+      this.$axios({
+        method: "post",
+        url: "/admin/editUserPass",
+        data: {
+          user_id: this.editUserData.user_id,
+          oldPass: this.editUserData.oldPass,
+          newPass: this.editUserData.newPass,
+        },
+      })
+        .then(res => {
+          // res.data.status 为0时代表修改密码成功；为1时代表旧密码错误
+          switch (res.data.status) {
+            case 0:
+              this.dialogTableVisible = false;
+              this.$refs[formName].resetFields();
+              this.$message.success("修改密码成功");
+              break;
+            case 1:
+              this.errors.oldPassError = res.data.mess;
+              break;
+          }
+        })
+        .catch(err => console.log(err));
+    },
   },
   filters: {
     // 格式化文章发布时间
@@ -357,6 +487,12 @@ export default {
   watch: {
     radio() {
       this.ininTableData();
+    },
+    // 当对话框隐藏时，清空表单数据
+    dialogTableVisible(newVal) {
+      if (newVal === false) {
+        this.$refs["ruleForm"].resetFields();
+      }
     },
   },
   mounted() {
@@ -388,14 +524,6 @@ export default {
   .main {
     .usersTable {
       margin-top: 20px;
-    }
-    .post_title {
-      font-size: 30px;
-      padding-bottom: 20px;
-    }
-    .post_content {
-      line-height: 2;
-      overflow-x: hidden;
     }
     .avatar {
       width: 50px;
@@ -429,6 +557,14 @@ export default {
   // 底部分页
   .page_footer {
     margin-top: 20px;
+  }
+  // 对话框
+  .dialog {
+    .form_wrap {
+      .userInfo {
+        padding-bottom: 10px;
+      }
+    }
   }
 }
 </style>
