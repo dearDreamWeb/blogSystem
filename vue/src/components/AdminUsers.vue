@@ -53,28 +53,28 @@
             fixed="left"
             prop="user_id"
             label="用户ID"
-            width="150"
+            min-width="150"
           >
           </el-table-column>
           <!-- 用户名 -->
-          <el-table-column prop="user_name" label="用户名" width="120">
+          <el-table-column prop="user_name" label="用户名" min-width="120">
           </el-table-column>
           <!-- 昵称 -->
-          <el-table-column prop="user_nickName" label="昵称" width="180">
+          <el-table-column prop="user_nickName" label="昵称" min-width="180">
           </el-table-column>
           <!-- 加入时间 -->
           <el-table-column
             prop="user_createdTime"
             sortable="custom"
             label="加入时间"
-            width="180"
+            min-width="180"
           >
             <template slot-scope="scope">
               {{ scope.row.user_createdTime | formaterrDate }}
             </template>
           </el-table-column>
           <!-- 性别 -->
-          <el-table-column prop="user_sex" label="性别" width="50">
+          <el-table-column prop="user_sex" label="性别" min-width="50">
             <template slot-scope="scope">
               <i
                 :class="
@@ -85,19 +85,19 @@
             </template>
           </el-table-column>
           <!-- 邮箱 -->
-          <el-table-column prop="user_email" label="邮箱" width="180">
+          <el-table-column prop="user_email" label="邮箱" min-width="180">
           </el-table-column>
           <!-- 头像 -->
-          <el-table-column prop="user_avatar" label="头像" width="80">
+          <el-table-column prop="user_avatar" label="头像" min-width="80">
             <template slot-scope="scope">
               <img :src="scope.row.user_avatar" alt="头像" class="avatar" />
             </template>
           </el-table-column>
           <!-- 地址 -->
-          <el-table-column prop="user_address" label="地址" width="180">
+          <el-table-column prop="user_address" label="地址" min-width="180">
           </el-table-column>
           <!-- 生日 -->
-          <el-table-column prop="user_birthday" label="生日" width="100">
+          <el-table-column prop="user_birthday" label="生日" min-width="100">
           </el-table-column>
 
           <!-- 状态 -->
@@ -105,7 +105,7 @@
             prop="user_isFreeze"
             fixed="right"
             label="状态"
-            width="80"
+            min-width="80"
           >
             <template slot-scope="scope">
               <el-tag
@@ -116,7 +116,7 @@
             </template>
           </el-table-column>
           <!-- 操作 -->
-          <el-table-column fixed="right" label="操作" width="150">
+          <el-table-column fixed="right" label="操作" min-width="150">
             <template slot-scope="scope">
               <!-- 切换用户状态 -->
               <i

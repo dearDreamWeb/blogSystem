@@ -44,13 +44,13 @@
           style="width: 100%"
         >
           <!-- 文章ID -->
-          <el-table-column prop="post_id" label="文章ID" width="180">
+          <el-table-column prop="post_id" label="文章ID" min-width="180">
           </el-table-column>
           <!-- 作者 -->
-          <el-table-column prop="user_nickName" label="作者" width="180">
+          <el-table-column prop="user_nickName" label="作者" min-width="180">
           </el-table-column>
           <!-- 文章标签 -->
-          <el-table-column prop="post_tag" label="文章标签" width="180">
+          <el-table-column prop="post_tag" label="文章标签" min-width="180">
             <template slot-scope="scope">
               <el-tag size="medium">{{ scope.row.post_tag }}</el-tag>
             </template>
@@ -60,14 +60,14 @@
             prop="post_createTime"
             sortable="custom"
             label="发布时间"
-            width="180"
+            min-width="180"
           >
             <template slot-scope="scope">
               {{ scope.row.post_createTime | formaterrDate }}
             </template>
           </el-table-column>
           <!-- 文章标题 -->
-          <el-table-column prop="post_title" label="文章标题" width="250">
+          <el-table-column prop="post_title" label="文章标题" min-width="250">
             <template slot-scope="scope">
               {{ scope.row.post_title }}
             </template>
@@ -76,12 +76,12 @@
           <el-table-column
             prop="post_title"
             label="文章内容"
-            width="250"
+            min-width="250"
             :formatter="formatterContent"
           >
           </el-table-column>
           <!-- 操作 -->
-          <el-table-column fixed="right" label="操作" width="180">
+          <el-table-column fixed="right" label="操作" min-width="180">
             <template slot-scope="scope">
               <el-button
                 type="primary"
@@ -114,13 +114,13 @@
           style="width: 100%"
         >
           <!-- 评论ID -->
-          <el-table-column prop="comment_id" label="评论ID" width="180">
+          <el-table-column prop="comment_id" label="评论ID" min-width="180">
           </el-table-column>
           <!-- 评论者 -->
-          <el-table-column prop="user_nickName" label="评论者" width="180">
+          <el-table-column prop="user_nickName" label="评论者" min-width="180">
           </el-table-column>
           <!-- 评论内容 -->
-          <el-table-column prop="comment_content" label="评论内容" width="300">
+          <el-table-column prop="comment_content" label="评论内容" min-width="300">
             <template slot-scope="scope">
               {{ formatterCommentContent(scope.row.comment_content) }}
             </template>
@@ -130,14 +130,14 @@
             prop="comment_createTime"
             sortable="custom"
             label="评论时间"
-            width="180"
+            min-width="180"
           >
             <template slot-scope="scope">
               {{ scope.row.comment_createTime | formaterrDate }}
             </template>
           </el-table-column>
           <!-- 操作 -->
-          <el-table-column label="操作" width="180" v-if="pathType === 1">
+          <el-table-column label="操作" min-width="180" v-if="pathType === 1">
             <template slot-scope="scope">
               <el-button
                 type="primary"

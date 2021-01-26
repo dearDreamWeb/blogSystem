@@ -130,6 +130,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   width: 100vw;
   height: 100vh;
   background-image: linear-gradient(-20deg, #d558c8 0%, #24d292 100%);
