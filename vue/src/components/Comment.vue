@@ -30,7 +30,17 @@
     </div>
     <div class="main" v-if="commentArr.length > 0">
       <ul>
-        <li v-for="(item, index) in commentArr" :key="index" class="item">
+        <li
+          v-for="(item, index) in commentArr"
+          :key="index"
+          class="item"
+          @click="
+            $router.push({
+              name: 'aboutLink',
+              params: { id: item.user_id },
+            })
+          "
+        >
           <img :src="item.user_avatar" class="avatar" />
           <span class="name">{{ item.user_nickName }}</span>
           <span class="time">{{ item.comment_createTime | handleDate }}</span>
@@ -201,6 +211,10 @@ export default {
     .item {
       padding-bottom: 1rem;
       border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      &:hover {
+        color: rgb(8, 199, 189);
+      }
       .avatar {
         margin: 0.5rem 0.5rem 0 0;
         width: 2rem;
@@ -208,13 +222,17 @@ export default {
         border-radius: 50%;
       }
       .name {
-        vertical-align: super;
+        display: inline-block;
+        vertical-align: text-bottom;
+        height: 2rem;
         padding-right: 1rem;
         font-weight: 500;
       }
       .time {
+        display: inline-block;
+        vertical-align: text-bottom;
+        height: 2rem;
         font-size: 0.7rem;
-        vertical-align: super;
         color: $diy_gary;
       }
       .comment_conetent {
