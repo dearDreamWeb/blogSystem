@@ -6,7 +6,7 @@ let pool = mysql.createPool({
     password: '123456',
     database: 'blogSystem',
     charset: 'UTF8MB4_BIN'
-})
+}) 
 query = (sql, values, callback) => {
     //连接池建立链接
     pool.getConnection((err, connection) => {

@@ -142,20 +142,17 @@ export default {
 
     // 获取用户数据
     getUserInfo() {
-      let userInfo = this.$store.getters.getUserInfo;
-      let user_id = userInfo.userInfo.user_id;
-      let isLogin = userInfo.userInfo.isLogin;
-      this.isLogin = isLogin;
       this.$axios({
         method: "get",
         url: "/getUserInfo",
-        params: {
-          user_id,
-        },
       })
         .then(res => {
           if (res.data.state === 0) {
             this.userInfo = res.data.userInfo;
+            this.$store.commit("setUserInfo", res.data.userInfo);
+            this.isLogin = true;
+          } else {
+            this.isLogin = false;
           }
         })
         .catch(err => {
@@ -177,7 +174,7 @@ export default {
         .then(res => {
           if (res.data.state === 0) {
             this.$message.success("注销成功");
-            window.sessionStorage.removeItem("userInfo");
+            this.$store.commit("loginOut");
             this.isLogin = false;
             this.$router.push({ name: "homeLink" }).catch(() => {
               this.reload();

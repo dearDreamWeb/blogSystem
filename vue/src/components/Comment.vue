@@ -77,24 +77,8 @@ export default {
     initUserInfo() {
       let store_userInfo = this.$store.getters.getUserInfo.userInfo;
       if (store_userInfo) {
-        let user_id = store_userInfo.user_id;
-        let isLogin = store_userInfo.isLogin;
-        this.isLogin = isLogin;
-        this.$axios({
-          method: "get",
-          url: "/getUserInfo",
-          params: {
-            user_id,
-          },
-        })
-          .then(res => {
-            if (res.data.state === 0) {
-              this.userInfo = res.data.userInfo;
-            }
-          })
-          .catch(err => {
-            console.log(err);
-          });
+        this.isLogin = store_userInfo.isLogin;
+        this.userInfo =store_userInfo;
       }
     },
 

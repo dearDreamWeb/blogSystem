@@ -167,8 +167,8 @@ export default {
                 case 0:
                   this.$message.success("登录成功");
                   this.$refs["ruleForm"].resetFields();
-                  // 向vuex中传入登录成功的用户的id
-                  this.$store.commit("setUserInfo", res.data.user_id);
+                  // 向vuex中传入登录成功的用户的信息
+                  this.$store.commit("setUserInfo", res.data);
                   this.$emit("userIsLogin");
                   this.$emit("changeLoginVisible", false);
                   this.$router.push({ name: "homeLink" }).catch(() => {
