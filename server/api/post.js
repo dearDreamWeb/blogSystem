@@ -14,10 +14,10 @@ module.exports = (router, crud) => {
                 post_id: randomId,
                 post_masterId: req.session.userInfo.user_id,
                 post_title: req.body.title,
-                post_content: req.body.content,
+                post_content: req.body.content, 
                 post_createTime: date,
                 post_tag: req.body.tag
-            } 
+            }  
             crud("INSERT INTO `post` SET ?", objData, data => {
                 res.json({ state: 0 });
             }) 

@@ -24,7 +24,7 @@ module.exports = (router, crud) => {
     router.get("/admin/isLogin", (req, res) => {
         if (req.session.adminInfo) {
             let { username, category } = req.session.adminInfo;
-            res.json({
+            res.json({ 
                 status: 0,
                 adminUsername: username,
                 category: category === 1 ? true : false  // 为1是超级管理员，返回true
