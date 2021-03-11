@@ -10,7 +10,7 @@ export default new Vuex.Store({
     // 用户信息
     userInfo: store.getItem("userInfo"),
     // 管理员账号
-    adminUsername: store.getItem("adminUsername")
+    adminUsername: ''
 
   },
   getters: {
@@ -36,7 +36,6 @@ export default new Vuex.Store({
     // 设置管理员账号
     setAdminUsername(state, data) {
       state.adminUsername = data;
-      store.setItem("adminUsername", data);
     }
   },
   modules: {}

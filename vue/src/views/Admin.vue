@@ -215,7 +215,6 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    // 获取用户数据
   },
   computed: {
     // 面包屑的导航信息
@@ -238,17 +237,6 @@ export default {
   mounted() {
     this.initActiveIndex();
     this.adminIsLogin();
-  },
-  // 路由拦截
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      let adminUsername = vm.$store.getters.getAdminUsername;
-      if (!adminUsername) {
-        vm.$message.info("管理员未登录，请先登录");
-        vm.$router.push("/");
-        return false;
-      }
-    });
   },
 };
 </script>

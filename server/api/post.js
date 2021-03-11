@@ -9,7 +9,7 @@ module.exports = (router, crud) => {
             let date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
             // 引入随机id值
             let randomId = require("../randomId")();
-            // 插入的数据
+            // 插入的数据 
             let objData = {
                 post_id: randomId,
                 post_masterId: req.session.userInfo.user_id,
@@ -17,10 +17,10 @@ module.exports = (router, crud) => {
                 post_content: req.body.content,
                 post_createTime: date,
                 post_tag: req.body.tag
-            }
+            } 
             crud("INSERT INTO `post` SET ?", objData, data => {
                 res.json({ state: 0 });
-            })
+            }) 
         } else {
             res.json({
                 status: 1,
@@ -121,10 +121,18 @@ module.exports = (router, crud) => {
     /**
      * 获取指定的文章
      * 并更新阅读数量
+     * 向浏览记录表中插入一条数据
      */
     router.get("/get_post", (req, res) => {
         crud("SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_id = ?", [req.query.post_id], data => {
             if (data.length > 0) {
+                // 引入随机id值
+                let randomId = require("../randomId")();
+                const { post_id, post_tag } = data[0];
+                const user_id = req.session.userInfo ? req.session.userInfo.user_id : null;
+                // 新增浏览记录表
+                crud("INSERT INTO `browsing_history` SET ?", { user_id, post_id, tag_name: post_tag, id: randomId })
+
                 crud("UPDATE `post` SET post_read_count = post_read_count + 1 WHERE post_id =?", [req.query.post_id], () => {
                     res.json({
                         state: 0,

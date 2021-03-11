@@ -32,7 +32,7 @@ module.exports = (router, crud) => {
         } else {
             res.json({
                 status: 1,
-                mess: "管理员未登录，请先登录"
+                mess: "管理员未登录，请先登录" 
             })
         }
     })
@@ -60,12 +60,10 @@ module.exports = (router, crud) => {
         }
 
         // 通过post表来累加supports、views、comments数据
-        crud("SELECT * FROM `post`", [], data => {
-            data.forEach(item => {
-                objData.views += item.post_read_count;
-                objData.supports += item.post_praise_count;
-                objData.comments += item.post_comment_count;
-            })
+        crud("SELECT SUM(post_read_count),SUM(post_comment_count),SUM(post_praise_count) FROM `post`", [], data => {
+            objData.views = data[0]['SUM(post_read_count)'];
+            objData.supports = data[0]['SUM(post_praise_count)'];
+            objData.comments = data[0]['SUM(post_comment_count)'];
         })
 
         // 通过users表来累加users、yearNewUsers、ageCategoires数据
