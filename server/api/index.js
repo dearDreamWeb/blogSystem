@@ -9,6 +9,9 @@ module.exports = (app, express) => {
     // 使用插入到接口
     const crud = require("../crud");
 
+    // 全局的路由
+    require("./global")(router, crud);
+
     // 城市地址
     require("./cities")(router, crud);
 

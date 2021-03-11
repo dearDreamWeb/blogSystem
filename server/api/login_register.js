@@ -6,8 +6,14 @@ module.exports = (router, crud) => {
             [req.query.userName, req.query.userPassword], data => {
                 if (data.length > 0) {
                     if (data[0].user_isFreeze === 0) {
-                        req.session.userInfo = data[0];
-                        res.json({ status: 0, user_id: req.session.userInfo.user_id });
+                        let uuid = require("../randomId")() + require("../randomId")();
+                        res.cookie('uuid', uuid, { maxAge: 1000 * 60 * 60 * 24 * 7 }); //向前端种一个cookie，存放时间是7天
+                        crud("INSERT INTO `user_uuid` SET?", { uuid, user_id: data[0].user_id }); // 向数据库中存入用户登录的uuid
+
+                        let obj = { ...data[0] };
+                        delete obj.user_password;
+                        req.session.userInfo = obj;
+                        res.json({ status: 0, user_id: obj.user_id });
                     } else {
                         // 代表该账号已冻结
                         res.json({
@@ -91,6 +97,27 @@ module.exports = (router, crud) => {
         } else {
             res.json({ state: 1 });
         }
+    })
+
+    /** 
+     * 获取用户信息
+     * state:0代表用户存在
+     * state:1代表用户不存在
+     * */
+    router.get("/getUserAbout", (req, res) => {
+        const { user_id } = req.query;
+        crud("SELECT * FROM `users` WHERE user_id=?", [user_id], data => {
+            if (data.length > 0) {
+                let dataObj = { ...data[0] };
+                delete dataObj.user_password;
+                res.json({
+                    state: 0,
+                    userInfo: dataObj
+                })
+            } else {
+                res.json({ state: 1 });
+            }
+        })
     })
 
     // 注销

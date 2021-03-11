@@ -131,7 +131,7 @@ export default {
         this.initData_post(user_id),
         this.initData_userInfo(user_id),
       ])
-        .then((values) => {
+        .then(values => {
           /**
            * state:0代表用户存在
            * state:1代表用户不存在
@@ -141,7 +141,6 @@ export default {
           } else if (values[0].data.state === 1) {
             this.$router.push({ name: "errorLink" });
           }
-
           if (values[1].data.state === 0) {
             this.userInfo = values[1].data.userInfo;
             // 获取vuex中的用户信息，看个人中心是不是该用户的，是的话，显示编辑个人资料；不是的话则不显示
@@ -153,7 +152,7 @@ export default {
             }
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
 
@@ -174,7 +173,7 @@ export default {
     initData_userInfo(user_id) {
       return this.$axios({
         method: "get",
-        url: "/getUserInfo",
+        url: "/getUserAbout",
         params: {
           user_id,
         },
@@ -261,6 +260,7 @@ export default {
         display: inline-block;
         border-radius: 50%;
         font-weight: 500;
+        color: #fff;
       }
       .el-icon-male {
         background: $diy_blue;
