@@ -14,6 +14,22 @@
 论坛名字是自己想的，叫做 天方夜谈，logo和favicon都是自己做的。
 像布局之类的大多数是借鉴了csdn和知乎这两大论坛，少部分借鉴的是微博。
 
+# 运行项目
+先分别到vue和server文件夹中安装依赖，在分别运行vue项目和node项目。记得把sql文件导入mysql的数据库中。  
+操作步骤：  
+启动vue项目
+```
+第一步：cd vue
+第二步：cnpm install 或 npm install 或 yarn install 
+第三步：npm run serve 或 yarn serve
+```
+启动node项目
+```
+第一步：cd server
+第二步：cnpm install 或 npm install 或 yarn install 
+第三步：nodemon index.js
+```
+
 # 效果图
 
 

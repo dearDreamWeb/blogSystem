@@ -29,7 +29,10 @@ module.exports = (router, crud) => {
                 })
             })
         } else {
-            res.json({ state: 1 });
+            res.json({
+                state: 1,
+                errCode: 0
+            });
         }
     });
 

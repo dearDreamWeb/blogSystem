@@ -221,7 +221,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     // 如果未登录返回首页，提示用户登录
     next(vm => {
-      let isLogin = vm.$store.getters.getUserInfo.userInfo;
+      let isLogin = vm.$store.getters.getUserInfo;
       isLogin
         ? true
         : vm.$router.push({ name: "homeLink" }) &&

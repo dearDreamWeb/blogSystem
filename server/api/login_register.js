@@ -95,7 +95,10 @@ module.exports = (router, crud) => {
                 userInfo: req.session.userInfo
             })
         } else {
-            res.json({ state: 1 });
+            res.json({
+                state: 1,
+                errCode: 0
+            });
         }
     })
 
@@ -149,7 +152,8 @@ module.exports = (router, crud) => {
             })
         } else {
             res.json({
-                status: 1
+                status: 1,
+                errCode: 0
             })
         }
     })

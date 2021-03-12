@@ -3,7 +3,12 @@
     <div class="container" ref="container">
       <!-- 头部 -->
       <div class="post_header">
-        <div class="title">{{ postData.post_title }}</div>
+        <el-page-header
+          @back="$router.back(-1)"
+          class="title"
+          :content="postData.post_title"
+        >
+        </el-page-header>
         <div class="info">
           <!-- 点击作者头像或者名字跳转作者的个人中心 -->
           <div
@@ -80,14 +85,14 @@ export default {
           post_id,
         },
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             this.postData = res.data.postData;
           } else if (res.data.state === 1) {
             this.$router.push({ name: "errorLink" });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -99,7 +104,7 @@ export default {
         method: "get",
         url: "/getSupportArr",
       })
-        .then((res) => {
+        .then(res => {
           if (res.data.state === 0) {
             // 判断用户的点过赞的文章中是否有该文章，有的话already_parise为true，没有为false
             this.already_parise = res.data.arr.includes(
@@ -107,7 +112,7 @@ export default {
             );
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -124,7 +129,7 @@ export default {
           post_id: this.$route.params.post_id,
         },
       })
-        .then((res) => {
+        .then(res => {
           /**
            * state为0代表取消点赞
            * state为1代表点赞
@@ -144,7 +149,7 @@ export default {
               break;
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
@@ -157,8 +162,10 @@ export default {
       wrapper.innerHTML = this.postData.post_content;
       let imgArr = Array.from(document.querySelectorAll("img"));
       imgArr.forEach(item => {
-        item.style.maxWidth = window.getComputedStyle(this.$refs.container).width;
-      })
+        item.style.maxWidth = window.getComputedStyle(
+          this.$refs.container
+        ).width;
+      });
     },
   },
   created() {
@@ -190,6 +197,11 @@ export default {
       .title {
         font-size: 1.7rem;
         padding-bottom: 1rem;
+        ::v-deep .el-page-header__left {
+          &:hover {
+            color: $diy_blue;
+          }
+        }
       }
       .info {
         display: flex;

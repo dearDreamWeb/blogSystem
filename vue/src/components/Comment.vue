@@ -57,7 +57,6 @@ export default {
     return {
       textarea: "",
       userInfo: {},
-      isLogin: false,
       commentArr: [],
     };
   },
@@ -75,10 +74,9 @@ export default {
 
     // 初始化登录用户的信息
     initUserInfo() {
-      let store_userInfo = this.$store.getters.getUserInfo.userInfo;
+      let store_userInfo = this.$store.getters.getUserInfo;
       if (store_userInfo) {
-        this.isLogin = store_userInfo.isLogin;
-        this.userInfo =store_userInfo;
+        this.userInfo = store_userInfo;
       }
     },
 
@@ -130,6 +128,9 @@ export default {
     submitBtnDisable() {
       let reg = /^\s+$/;
       return reg.test(this.textarea) || !this.textarea ? true : false;
+    },
+    isLogin() {
+      return this.$store.getters.getUserInfo.isLogin;
     },
   },
   filters: {

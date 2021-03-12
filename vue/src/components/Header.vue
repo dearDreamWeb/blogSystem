@@ -86,32 +86,15 @@ export default {
       searchVal: "",
       loginVisible: false,
       registerVisible: false,
-      isLogin: false,
       userInfo: {},
     };
   },
   methods: {
     // 初始化数据
     async initData() {
-      await this.initIsLogin();
       // 判断当注销过用户信息后不调用getUserInfo方法
       let userInfo = this.$store.getters.getUserInfo;
-      userInfo.userInfo && this.getUserInfo();
-    },
-
-    // 是否登录
-    initIsLogin() {
-      return this.$axios({
-        method: "get",
-        url: "/userIsLogin",
-      })
-        .then(res => {
-          if (res.data.status !== 0) {
-            this.isLogin = false;
-            window.sessionStorage.removeItem("userInfo");
-          }
-        })
-        .catch(err => console.log(err));
+      userInfo && this.getUserInfo();
     },
 
     // 搜索标签 如果当前路由在searchLink时，输入框里填充搜索的值
@@ -150,10 +133,7 @@ export default {
           if (res.data.state === 0) {
             this.userInfo = res.data.userInfo;
             this.$store.commit("setUserInfo", res.data.userInfo);
-            this.isLogin = true;
-          } else {
-            this.isLogin = false;
-          }
+          } 
         })
         .catch(err => {
           console.log(err);
@@ -175,7 +155,6 @@ export default {
           if (res.data.state === 0) {
             this.$message.success("注销成功");
             this.$store.commit("loginOut");
-            this.isLogin = false;
             this.$router.push({ name: "homeLink" }).catch(() => {
               this.reload();
             });
@@ -212,6 +191,11 @@ export default {
         },
       });
       this.reload();
+    },
+  },
+  computed: {
+    isLogin() {
+      return this.$store.getters.getUserInfo.isLogin;
     },
   },
   created() {
@@ -272,7 +256,9 @@ export default {
     .avatar {
       margin: 0 0.5rem;
       width: 2rem;
+      height: 2rem;
       border-radius: 50%;
+      object-fit: cover;
       &:hover {
         cursor: pointer;
       }

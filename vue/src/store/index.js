@@ -1,9 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     // 用户信息
     userInfo: {},
@@ -12,9 +13,7 @@ export default new Vuex.Store({
   },
   getters: {
     getUserInfo(state) {
-      return {
-        userInfo: state.userInfo
-      }
+      return state.userInfo
     },
     getAdminUsername(state) {
       return state.adminUsername;
@@ -40,3 +39,5 @@ export default new Vuex.Store({
   },
   modules: {}
 });
+
+export default store;

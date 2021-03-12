@@ -144,7 +144,7 @@ export default {
           if (values[1].data.state === 0) {
             this.userInfo = values[1].data.userInfo;
             // 获取vuex中的用户信息，看个人中心是不是该用户的，是的话，显示编辑个人资料；不是的话则不显示
-            let store_userInfo = this.$store.getters.getUserInfo.userInfo;
+            let store_userInfo = this.$store.getters.getUserInfo;
             if (store_userInfo) {
               this.userInfo.user_id === store_userInfo.user_id
                 ? (this.editDataVisible = true)
@@ -191,7 +191,7 @@ export default {
      * 先把富文本编辑器的带有html标签的内容填充进去，在用innerText进行内容截取
      */
     content() {
-      let arr = this.$refs.post_content;
+      let arr = this.$refs.post_content || [];
       arr.forEach((item, index) => {
         item.innerHTML = this.postArr[index].post_content;
         // 先用正则把空格去掉，再进行截取长度，最后加上...当成省略
@@ -241,6 +241,8 @@ export default {
       .avatar {
         padding: 0.2rem;
         width: 7rem;
+        height: 7rem;
+        object-fit: cover;
         border-radius: 50%;
         background: $diy_gary;
         box-sizing: border-box;
