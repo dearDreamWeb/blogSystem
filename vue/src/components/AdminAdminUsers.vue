@@ -121,16 +121,6 @@
             :rules="rules"
             ref="ruleForm"
           >
-            <el-form-item
-              label="旧密码"
-              prop="oldPass"
-              :error="errors.oldPassError"
-            >
-              <el-input
-                type="password"
-                v-model="editUserData.oldPass"
-              ></el-input>
-            </el-form-item>
             <el-form-item label="新密码" prop="newPass">
               <el-input
                 type="password"
@@ -312,7 +302,6 @@ export default {
       },
       // form表单规则
       rules: {
-        oldPass: [{ validator: validateNewPass, trigger: "blur" }],
         newPass: [{ validator: validateNewPass, trigger: "blur" }],
         checkNewPass: [{ validator: validateCheckNewPass, trigger: "blur" }],
         adminUserName: [{ validator: validateName, trigger: "blur" }],
@@ -321,7 +310,6 @@ export default {
       },
       // form表单错误
       errors: {
-        oldPassError: "", // 旧密码错误提示
         usernameError: "", // 用户名错误提示
       },
     };
@@ -397,7 +385,6 @@ export default {
      * 提交编辑用户的信息
      */
     submitEditUserInfo(formName) {
-      this.errors.oldPassError = "";
       this.errors.usernameError = "";
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -409,7 +396,6 @@ export default {
           let data = this.editUserData.id
             ? {
                 adminUser_id: this.editUserData.id,
-                oldPass: this.editUserData.oldPass,
                 newPass: this.editUserData.newPass,
               }
             : {
@@ -422,23 +408,14 @@ export default {
             data,
           })
             .then(res => {
-              // res.data.status 为0时代表修改密码成功；为1时代表旧密码错误
-              switch (res.data.status) {
-                case 0:
-                  this.dialogTableVisible = false;
-                  this.$refs[formName].resetFields();
-                  this.$message.success(res.data.mess);
-                  if (!this.editUserData.id) {
-                    this.reload();
-                  }
-                  break;
-                case 1:
-                  if (this.editUserData.id) {
-                    this.errors.oldPassError = res.data.mess;
-                  } else {
-                    this.errors.usernameError = res.data.mess;
-                  }
-                  break;
+              // res.data.status 为0时代表修改密码成功
+              if (res.data.status === 0) {
+                this.dialogTableVisible = false;
+                this.$refs[formName].resetFields();
+                this.$message.success(res.data.mess);
+                if (!this.editUserData.id) {
+                  this.reload();
+                }
               }
             })
             .catch(err => console.log(err));

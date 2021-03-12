@@ -93,7 +93,7 @@ module.exports = (router, crud) => {
     router.post("/admin/editUserPass", (req, res) => {
         let { user_id, oldPass, newPass } = req.body;
         crud("SELECT user_password FROM `users` WHERE `user_id`=? ", [user_id], data => {
-            if (data[0].user_password === oldPass) {
+            if (data.length > 0) {
                 crud("UPDATE `users` SET `user_password` = ? WHERE user_id =?", [newPass, user_id], () => {
                     res.json({
                         status: 0
@@ -102,7 +102,7 @@ module.exports = (router, crud) => {
             } else {
                 res.json({
                     status: 1,
-                    mess: "旧密码错误"
+                    mess: '用户不存在'
                 })
             }
         })
@@ -197,21 +197,14 @@ module.exports = (router, crud) => {
    * 修改管理员用户密码
    */
     router.post("/admin/changeAdminUserPass", (req, res) => {
-        let { adminUser_id, oldPass, newPass } = req.body;
+        let { adminUser_id, newPass } = req.body;
         crud("SELECT password FROM `admin_users` WHERE `id`=? ", [adminUser_id], data => {
-            if (data[0].password === oldPass) {
-                crud("UPDATE `admin_users` SET `password` = ? WHERE id =?", [newPass, adminUser_id], () => {
-                    res.json({
-                        status: 0,
-                        mess: "修改密码成功"
-                    })
-                })
-            } else {
+            crud("UPDATE `admin_users` SET `password` = ? WHERE id =?", [newPass, adminUser_id], () => {
                 res.json({
-                    status: 1,
-                    mess: "旧密码错误"
+                    status: 0,
+                    mess: "修改密码成功"
                 })
-            }
+            })
         })
 
     })

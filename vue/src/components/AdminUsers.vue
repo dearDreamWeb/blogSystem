@@ -168,16 +168,6 @@
             :rules="rules"
             ref="ruleForm"
           >
-            <el-form-item
-              label="旧密码"
-              prop="oldPass"
-              :error="errors.oldPassError"
-            >
-              <el-input
-                type="password"
-                v-model="editUserData.oldPass"
-              ></el-input>
-            </el-form-item>
             <el-form-item label="新密码" prop="newPass">
               <el-input
                 type="password"
@@ -305,13 +295,8 @@ export default {
       },
       // form表单规则
       rules: {
-        oldPass: [{ validator: validateNewPass, trigger: "blur" }],
         newPass: [{ validator: validateNewPass, trigger: "blur" }],
         checkNewPass: [{ validator: validateCheckNewPass, trigger: "blur" }],
-      },
-      // form表单错误
-      errors: {
-        oldPassError: "",
       },
     };
   },
@@ -426,7 +411,6 @@ export default {
      * 提交编辑用户的信息
      */
     submitEditUserInfo(formName) {
-      this.errors.oldPassError = "";
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.$axios({
@@ -434,21 +418,17 @@ export default {
             url: "/admin/editUserPass",
             data: {
               user_id: this.editUserData.user_id,
-              oldPass: this.editUserData.oldPass,
               newPass: this.editUserData.newPass,
             },
           })
             .then(res => {
-              // res.data.status 为0时代表修改密码成功；为1时代表旧密码错误
-              switch (res.data.status) {
-                case 0:
-                  this.dialogTableVisible = false;
-                  this.$refs[formName].resetFields();
-                  this.$message.success("修改密码成功");
-                  break;
-                case 1:
-                  this.errors.oldPassError = res.data.mess;
-                  break;
+              // res.data.status 为0时代表修改密码成功
+              if (res.data.status === 0) {
+                this.dialogTableVisible = false;
+                this.$refs[formName].resetFields();
+                this.$message.success("修改密码成功");
+              } else {
+                this.$message.success(res.data.mess);
               }
             })
             .catch(err => console.log(err));
