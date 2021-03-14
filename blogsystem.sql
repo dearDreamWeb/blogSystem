@@ -2,15 +2,15 @@
 Navicat MySQL Data Transfer
 
 Source Server         : localhost
-Source Server Version : 80023
+Source Server Version : 80021
 Source Host           : localhost:3306
 Source Database       : blogsystem
 
 Target Server Type    : MYSQL
-Target Server Version : 80023
+Target Server Version : 80021
 File Encoding         : 65001
 
-Date: 2021-03-12 20:04:04
+Date: 2021-03-14 08:56:42
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -353,11 +353,11 @@ INSERT INTO `comment` VALUES ('fa7233d99e69', 'f704e6dbac99', '老有画面感�
 DROP TABLE IF EXISTS `post`;
 CREATE TABLE `post` (
   `post_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `post_masterId` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `post_title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `post_masterId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `post_title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `post_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `post_createTime` datetime NOT NULL,
-  `post_tag` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `post_tag` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `post_read_count` int NOT NULL DEFAULT '0',
   `post_praise_count` int NOT NULL DEFAULT '0',
   `post_comment_count` int NOT NULL DEFAULT '0',
@@ -557,24 +557,34 @@ INSERT INTO `users` VALUES ('fldf42e61451', 'user18', '123456', '1', '德玛', '
 -- ----------------------------
 DROP TABLE IF EXISTS `user_uuid`;
 CREATE TABLE `user_uuid` (
-  `uuid` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Records of user_uuid
 -- ----------------------------
+INSERT INTO `user_uuid` VALUES ('0606971b510d0606971b510d', '2021-03-14 08:17:35', '80059c20ce12');
+INSERT INTO `user_uuid` VALUES ('08326f3f65e508326f3f65e5', '2021-03-14 08:13:21', 'fe2122e61451');
 INSERT INTO `user_uuid` VALUES ('19b94197748519b941977485', '2021-03-11 19:18:05', '116a0f9bd856');
 INSERT INTO `user_uuid` VALUES ('1c0f28353cc01c0f28353cc0', '2021-03-11 19:25:07', '62615d4d3f6e');
+INSERT INTO `user_uuid` VALUES ('2a262285472d2a262285472d', '2021-03-14 08:54:40', '59d3134af14b');
+INSERT INTO `user_uuid` VALUES ('3970300b9d943970300b9d94', '2021-03-14 07:28:31', 'd02cf2e61451');
+INSERT INTO `user_uuid` VALUES ('3c8e017914de3c8e017914de', '2021-03-14 08:55:32', '59d3134af14b');
 INSERT INTO `user_uuid` VALUES ('47fab96aef0cba2cc2612f1f', '2021-03-11 19:16:50', '116a0f9bd856');
 INSERT INTO `user_uuid` VALUES ('506827b2781c506827b2781c', '2021-03-12 16:54:53', 'e52cf3r61451');
 INSERT INTO `user_uuid` VALUES ('5cc6a16250ae5cc6a16250ae', '2021-03-11 19:19:00', '116a0f9bd856');
 INSERT INTO `user_uuid` VALUES ('60ed31343902c221826a6987', '2021-03-12 17:47:01', 'fe2122e61451');
 INSERT INTO `user_uuid` VALUES ('6b92441a8baf6b92441a8baf', '2021-03-12 09:18:38', 'd02cf2e61451');
+INSERT INTO `user_uuid` VALUES ('7482cacab6d97482cacab6d9', '2021-03-14 08:16:00', 'd02cf2e67ed4');
 INSERT INTO `user_uuid` VALUES ('81c4d92963f981c4d92963f9', '2021-03-11 19:21:21', '116a0f9bd856');
 INSERT INTO `user_uuid` VALUES ('8763531b15188763531b1518', '2021-03-12 17:33:10', 'd02133ga45f');
+INSERT INTO `user_uuid` VALUES ('8c2c4bba39ef8c2c4bba39ef', '2021-03-14 08:12:08', 'fe2122e61451');
 INSERT INTO `user_uuid` VALUES ('8edadf85e65f8edadf85e65f', '2021-03-12 17:53:54', '80059c20ce12');
 INSERT INTO `user_uuid` VALUES ('a3cc3820ed7ea3cc3820ed7e', '2021-03-12 17:41:01', 'fe2122e61451');
+INSERT INTO `user_uuid` VALUES ('adb4e91436de8ff3dcddc11d', '2021-03-14 07:33:43', 'e52cf3r61451');
+INSERT INTO `user_uuid` VALUES ('c0842fdbd23ac0842fdbd23a', '2021-03-14 08:18:32', '59d3134af14b');
+INSERT INTO `user_uuid` VALUES ('ef4e19b584d2ef4e19b584d2', '2021-03-14 08:51:35', 'e52cf3r61451');
 INSERT INTO `user_uuid` VALUES ('f2927bd69fff9d471b78c8b3', '2021-03-11 19:24:32', '62615d4d3f6e');

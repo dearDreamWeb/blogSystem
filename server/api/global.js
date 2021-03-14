@@ -30,12 +30,14 @@ module.exports = (router, crud) => {
 
     // 处理前端获取的cookies，并返回前端cookie中的uuid
     const handleCookies = (cookies) => {
-        let arr = cookies.split(";")
         let cookiesObj = {}; //对象形式的cookie
-        arr.forEach(item => {
-            let objArr = item.split("=");
-            cookiesObj[objArr[0].trim()] = objArr[1].trim()
-        })
-        return cookiesObj.uuid;
+        if (cookies) {
+            let arr = cookies.split(";")
+            arr.forEach(item => {
+                let objArr = item.split("=");
+                cookiesObj[objArr[0].trim()] = objArr[1].trim()
+            })
+        }
+        return cookies && cookiesObj.uuid;
     }
 }

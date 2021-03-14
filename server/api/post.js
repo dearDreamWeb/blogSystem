@@ -1,10 +1,20 @@
 module.exports = (router, crud) => {
+    const request = require('request');
     /**
      *  新建一篇文章，导入数据库
      * */
     const moment = require("moment"); //格式化时间工具
     router.post("/setPost", (req, res) => {
         if (req.session.userInfo) {
+            let filterInfo = filterMingan(req);
+
+            if (filterInfo.length > 0) {
+                res.json({
+                    status: 2,
+                    mess: `含有敏感词汇${filterInfo.join('，')}`
+                })
+                return;
+            }
             // 新建时间
             let date = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
             // 引入随机id值
@@ -29,6 +39,23 @@ module.exports = (router, crud) => {
             })
         }
     });
+
+    // 过滤敏感词汇
+    const filterMingan = (req) => {
+        const mgArr = require('../assets/mgWords.json').wordsArr;
+        const { title, content, tag } = req.body;
+        let minganWeijinArr = [];
+        let reqData = [title, content, tag];
+        reqData.forEach((item) => {
+            for (let i = 0; i < mgArr.length; i++) {
+                if (item.includes(mgArr[i])) {
+                    minganWeijinArr.push(mgArr[i]);
+                    return;
+                }
+            }
+        })
+        return Array.from(new Set(minganWeijinArr));
+    }
 
     /**
      * 获取所有文章
@@ -178,8 +205,8 @@ module.exports = (router, crud) => {
         } else {
             res.json({
                 state: 2,
-                errCode: 0 
-            }) 
+                errCode: 0
+            })
         }
     });
 
@@ -204,7 +231,7 @@ module.exports = (router, crud) => {
             res.json({
                 state: 1,
                 mess: "用户未登录",
-                errCode: 0 
+                errCode: 0
             })
         }
     });
