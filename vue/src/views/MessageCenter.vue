@@ -37,20 +37,30 @@
               >
               {{ item.type === 1 ? "评论" : "点赞" }}了你的博客
             </template>
+            <span class="system_title" v-else>
+              你的博客审核未通过
+            </span>
           </p>
-          <p class="item_postTitle">
-            <span
-              class="title"
-              @click="
-                $router.push({
-                  name: 'postLink',
-                  params: { post_id: item.post_id },
-                })
-              "
-              >{{ item.post_title }}</span
-            >
-            <span class="date">{{ item.created_time | formateDate }}</span>
-          </p>
+          <div class="item_postTitle">
+            <template v-if="item.type !== 0">
+              <span
+                class="title"
+                @click="
+                  $router.push({
+                    name: 'postLink',
+                    params: { post_id: item.post_id },
+                  })
+                "
+                >{{ item.post_title }}</span
+              >
+              <span class="date">{{ item.created_time | formateDate }}</span>
+            </template>
+            <p class="system_text" v-else>
+              由于你的博客<span class="post_title"
+                >《{{ item.post_title }}》</span
+              >的内容违反了社区发布规范，审核未通过
+            </p>
+          </div>
         </li>
       </ul>
       <h1 class="noData" v-else>暂无消息</h1>
@@ -181,6 +191,10 @@ export default {
             cursor: pointer;
             color: $diy_blue;
           }
+          .system_title {
+            display: inline-block;
+            margin-left: 8px;
+          }
         }
         .item_postTitle {
           display: flex;
@@ -195,6 +209,12 @@ export default {
           .date {
             font-size: 12px;
             color: $diy_gary;
+          }
+          .system_text {
+            .post_title {
+              padding: 0 5px;
+              color: $diy_blue;
+            }
           }
         }
       }

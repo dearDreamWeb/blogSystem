@@ -22,10 +22,12 @@ module.exports = (router, crud) => {
                 // 如果type为undefined，说明是全部消息
                 if (type >= 0) {
                     crud("SELECT * FROM `messages` WHERE " + `type=${type} AND` + " state=? AND to_id=? ORDER BY created_time DESC", [0, to_id], data => {
-                        for (let i = 0; i < data.length; i++) {
-                            crud("SELECT `user_nickName` FROM `users` WHERE user_id=?", [data[i].from_id], userData => {
-                                data[i].from_username = userData[0].user_nickName;
-                            })
+                        if (type !== 0) {
+                            for (let i = 0; i < data.length; i++) {
+                                crud("SELECT `user_nickName` FROM `users` WHERE user_id=?", [data[i].from_id], userData => {
+                                    data[i].from_username = userData[0].user_nickName;
+                                })
+                            }
                         }
                         setTimeout(() => {
                             res.json({
@@ -38,9 +40,11 @@ module.exports = (router, crud) => {
                 } else {
                     crud("SELECT * FROM `messages` WHERE  state=? AND to_id=? ORDER BY created_time DESC", [0, to_id], data => {
                         for (let i = 0; i < data.length; i++) {
-                            crud("SELECT `user_nickName` FROM `users` WHERE user_id=?", [data[i].from_id], userData => {
-                                data[i].from_username = userData[0].user_nickName;
-                            })
+                            if (data[i].type !== 0) {
+                                crud("SELECT `user_nickName` FROM `users` WHERE user_id=?", [data[i].from_id], userData => {
+                                    data[i].from_username = userData[0].user_nickName;
+                                })
+                            }
                         }
                         setTimeout(() => {
                             res.json({

@@ -107,12 +107,23 @@ module.exports = (router, crud) => {
      * 删除文章
      */
     router.delete("/admin/deletPost", (req, res) => {
-        let { post_id } = req.query;
+        let { post_id, from_id, to_id, post_title } = req.query;
         crud(`DELETE FROM ` + "`post`" + ` WHERE post_id=?`, [post_id], () => {
-            res.json({
-                status: 0,
-                mess: "删除成功过"
+            // 向消息表中添加数据
+            const messageData = {
+                from_id,
+                to_id, 
+                post_id,
+                type: 0,
+                post_title
+            }
+            crud("INSERT INTO `messages` SET ?", messageData, () => {
+                res.json({
+                    status: 0,
+                    mess: "删除成功"
+                })
             })
+
         })
     })
 }

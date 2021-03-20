@@ -120,7 +120,11 @@
           <el-table-column prop="user_nickName" label="评论者" min-width="180">
           </el-table-column>
           <!-- 评论内容 -->
-          <el-table-column prop="comment_content" label="评论内容" min-width="300">
+          <el-table-column
+            prop="comment_content"
+            label="评论内容"
+            min-width="300"
+          >
             <template slot-scope="scope">
               {{ formatterCommentContent(scope.row.comment_content) }}
             </template>
@@ -349,7 +353,12 @@ export default {
       // 参数
       let params =
         this.pathType === 0
-          ? { post_id: data.post_id }
+          ? {
+              post_id: data.post_id,
+              from_id: this.$store.getters.getAdminUsername,
+              to_id: data.user_id,
+              post_title: data.post_title,
+            }
           : { comment_id: data.comment_id };
       // 确认框
       this.$confirm("永久删除该文章, 是否继续?", "提示", {
