@@ -97,7 +97,6 @@ export default {
       searchVal: "",
       loginVisible: false,
       registerVisible: false,
-      userInfo: {},
       messageCount: 0,
     };
   },
@@ -143,7 +142,6 @@ export default {
       })
         .then(res => {
           if (res.data.state === 0) {
-            this.userInfo = res.data.userInfo;
             this.messageCount = res.data.userInfo.unReadCount;
             this.$store.commit("setUserInfo", res.data.userInfo);
           }
@@ -210,6 +208,9 @@ export default {
     isLogin() {
       return this.$store.getters.getUserInfo.isLogin;
     },
+    userInfo() {
+      return this.$store.getters.getUserInfo || {};
+    },
   },
   created() {
     this.initData();
@@ -231,6 +232,9 @@ export default {
         this.searchVal = "";
         this.searchPost();
       }
+    },
+    userInfo() {
+      this.messageCount = this.userInfo.unReadCount;
     },
   },
   components: {

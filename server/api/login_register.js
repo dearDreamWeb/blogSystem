@@ -95,9 +95,16 @@ module.exports = (router, crud) => {
      * */
     router.get("/getUserInfo", (req, res) => {
         if (req.session && req.session.userInfo) {
-            res.json({
-                state: 0,
-                userInfo: req.session.userInfo
+            const { user_id } = req.session.userInfo;
+            // 获取未读消息数量
+            crud("SELECT count(is_read) FROM `messages` WHERE to_id =? AND state=? AND is_read=?", [user_id, 0, 0], messageData => {
+                let obj = { ...req.session.userInfo };
+                obj.unReadCount = messageData[0]['count(is_read)'];
+                req.session.userInfo = { ...obj };
+                res.json({
+                    state: 0,
+                    userInfo: obj
+                })
             })
         } else {
             res.json({

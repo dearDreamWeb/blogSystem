@@ -24,6 +24,9 @@ module.exports = (app, express) => {
     // 评论管理
     require("./comment")(router, crud);
 
+    // 消息中心管理
+    require("./message")(router, crud);
+
     // 后台系统
     require("./admin")(router, crud);
 
