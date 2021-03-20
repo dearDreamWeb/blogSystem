@@ -197,7 +197,18 @@ module.exports = (router, crud) => {
                 } else {
                     crud("INSERT INTO `post_support` SET ?", { "post_id": req.query.post_id, "user_id": req.session.userInfo.user_id }, data => {
                         crud("UPDATE `post` SET post_praise_count = post_praise_count + 1 WHERE post_id =?", [req.query.post_id], data => {
-                            res.json({ state: 1 })
+                            // 向消息表中添加数据
+                            const { from_id, to_id, post_id, post_title } = req.query;
+                            const messageData = {
+                                from_id,
+                                to_id,
+                                post_id,
+                                type: 2,
+                                post_title
+                            }
+                            crud("INSERT INTO `messages` SET ?", messageData, () => {
+                                res.json({ state: 1 })
+                            })
                         })
                     })
                 }

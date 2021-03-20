@@ -12,8 +12,13 @@ module.exports = (router, crud) => {
 
                         let obj = { ...data[0] };
                         delete obj.user_password;
-                        req.session.userInfo = obj;
-                        res.json({ status: 0, user_id: obj.user_id });
+                        // 获取未读消息数量
+                        crud("SELECT count(is_read) FROM `messages` WHERE to_id =? AND state=? AND is_read=?", [obj.user_id, 0, 0], messageData => {
+                            obj.unReadCount = messageData[0]['count(is_read)'];
+                            req.session.userInfo = obj;
+                            res.json({ status: 0, user_id: obj.user_id });
+                        })
+
                     } else {
                         // 代表该账号已冻结
                         res.json({

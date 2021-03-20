@@ -101,12 +101,20 @@ export default {
 
     // 添加评论
     addComment() {
+      let userInfo = this.$store.getters.getUserInfo;
+      if (!userInfo.isLogin) {
+        this.$message.warning("请先登录");
+        return;
+      }
       this.$axios({
         method: "post",
         url: "/addComment",
         data: {
           content: this.textarea,
           post_id: this.$route.params.post_id,
+          from_id: userInfo.user_id,
+          to_id: this.postData.user_id,
+          post_title: this.postData.post_title,
         },
       })
         .then(res => {

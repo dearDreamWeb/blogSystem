@@ -21,9 +21,20 @@ module.exports = (router, crud) => {
             crud("INSERT INTO `comment` SET ?", objData, () => {
                 crud("SELECT * FROM `comment` LEFT JOIN `users` ON  comment.comment_masterId = users.user_id WHERE comment_id = ?", [randomId], data => {
                     crud("UPDATE `post` SET post_comment_count = post_comment_count + 1 WHERE post_id = ?", [data[0].comment_postId], () => {
-                        res.json({
-                            state: 0,
-                            commentData: data[0]
+                        // 向消息表中添加数据
+                        const { from_id, to_id, post_id, post_title } = req.body;
+                        const messageData = {
+                            from_id,
+                            to_id,
+                            post_id,
+                            type: 1,
+                            post_title
+                        }
+                        crud("INSERT INTO `messages` SET ?", messageData, () => {
+                            res.json({
+                                state: 0,
+                                commentData: data[0]
+                            })
                         })
                     });
                 })

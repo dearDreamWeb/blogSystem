@@ -26,6 +26,17 @@
 
     <!-- 登录成功显示昵称，头像和注销 -->
     <el-col :xs="6" :sm="8" class="user" v-if="isLogin">
+      <!-- 消息中心图标 -->
+      <el-badge :hidden="!messageCount" :value="messageCount" :max="99">
+        <i
+          @click="$router.push('/messageCenter')"
+          :class="[
+            'el-icon-message-solid',
+            'default_msg',
+            messageCount ? 'hasMsg' : '',
+          ]"
+        ></i>
+      </el-badge>
       <!-- 当小屏时，隐藏 -->
       <span class="userName hidden-xs-only">{{ userInfo.user_nickName }}</span>
       <!-- 弹出框，可以选择个人中心还是写文章 -->
@@ -87,6 +98,7 @@ export default {
       loginVisible: false,
       registerVisible: false,
       userInfo: {},
+      messageCount: 0,
     };
   },
   methods: {
@@ -132,8 +144,9 @@ export default {
         .then(res => {
           if (res.data.state === 0) {
             this.userInfo = res.data.userInfo;
+            this.messageCount = res.data.userInfo.unReadCount;
             this.$store.commit("setUserInfo", res.data.userInfo);
-          } 
+          }
         })
         .catch(err => {
           console.log(err);
@@ -253,6 +266,38 @@ export default {
     height: 100%;
     justify-content: flex-end;
     align-items: center;
+    ::v-deep .el-badge {
+      position: relative;
+      &:hover {
+        &::after {
+          content: "消息中心";
+          display: block;
+          position: absolute;
+          left: 50%;
+          bottom: -25px;
+          margin-left: -25px;
+          padding: 5px 10px;
+          min-width: 50px;
+          font-size: 12px;
+          text-align: center;
+          border-radius: 3px;
+          color: $div_bgColor;
+          background-color: rgba(0, 0, 0, 0.5);
+        }
+      }
+      .el-badge__content {
+        right: 30px;
+      }
+    }
+    .default_msg {
+      padding: 0 20px 0 5px;
+      font-size: 20px;
+      color: $diy_gary;
+      cursor: pointer;
+      &.hasMsg {
+        color: $tb_color;
+      }
+    }
     .avatar {
       margin: 0 0.5rem;
       width: 2rem;

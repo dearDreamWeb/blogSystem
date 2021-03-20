@@ -11,6 +11,7 @@ const AdminHome = () => import("@/components/AdminHome.vue");
 const AdminTablePage = () => import("@/components/AdminTablePage.vue");
 const AdminUsers = () => import("@/components/AdminUsers.vue");
 const AdminAdminUsers = () => import("@/components/AdminAdminUsers.vue");
+const MessageCenter = () => import("@/views/MessageCenter.vue");
 
 
 
@@ -45,6 +46,12 @@ const routes = [
     path: "/post/:post_id",
     name: "postLink",
     component: Post
+  },
+  // 消息中心
+  {
+    path: "/messageCenter",
+    name: "messageCenter",
+    component: MessageCenter
   },
   // 管理员登录界面
   {

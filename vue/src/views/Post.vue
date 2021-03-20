@@ -122,11 +122,19 @@ export default {
      * 为点过赞设为点赞样式
      */
     toggleClass() {
+      let userInfo = this.$store.getters.getUserInfo;
+      if (!userInfo.isLogin) {
+        this.$message.warning("请先登录");
+        return;
+      }
       this.$axios({
         method: "get",
         url: "/addSupport",
         params: {
           post_id: this.$route.params.post_id,
+          from_id: userInfo.user_id,
+          to_id: this.postData.user_id,
+          post_title: this.postData.post_title,
         },
       })
         .then(res => {
