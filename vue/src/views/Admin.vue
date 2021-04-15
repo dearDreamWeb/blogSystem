@@ -39,6 +39,7 @@
             :default-active="activeIndex"
             class="el-menu-vertical-demo"
             :collapse="isCollapse"
+            :default-openeds="defaultOpen"
           >
             <div v-for="(item, index) in navData" :key="index">
               <!-- 
@@ -110,40 +111,41 @@ export default {
       navData: [
         {
           index: "1",
-          title: "首页",
+          title: "统计分析",
           path: "/admin/home",
-          icon: "el-icon-house",
+          icon: "el-icon-help",
         },
         {
           index: "2",
-          title: "内容系统",
+          title: "博客管理",
+          path: "/admin/post_lists",
           icon: "el-icon-files",
-          subnav: [
-            {
-              index: "2-1",
-              title: "文章列表",
-              path: "/admin/post_lists",
-            },
-            {
-              index: "2-2",
-              title: "评论列表",
-              path: "/admin/comments_lists",
-            },
-          ],
         },
         {
           index: "3",
-          title: "用户系统",
+          title: "评论管理",
+          path: "/admin/comments_lists",
+          icon: "el-icon-s-comment",
+        },
+        {
+          index: "4",
+          title: "分类管理",
+          path: "/admin/admin_category",
+          icon: "el-icon-price-tag",
+        },
+        {
+          index: "5",
+          title: "用户管理",
           icon: "el-icon-user",
           subnav: [
             {
               index: "3-1",
-              title: "网站用户",
+              title: "网站用户管理",
               path: "/admin/users",
             },
             {
               index: "3-2",
-              title: "后台管理员",
+              title: "管理员管理",
               path: "/admin/admin_users",
             },
           ],
@@ -153,6 +155,7 @@ export default {
       isCollapse: false, // 是否折叠左侧导航栏
       adminUsername: "", // 管理员名字
       isSuperAdmin: false, // 是否是超级管理员
+      defaultOpen: ["5"], // 默认打开的菜单
     };
   },
   methods: {

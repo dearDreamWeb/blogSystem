@@ -12,6 +12,7 @@ const AdminTablePage = () => import("@/components/AdminTablePage.vue");
 const AdminUsers = () => import("@/components/AdminUsers.vue");
 const AdminAdminUsers = () => import("@/components/AdminAdminUsers.vue");
 const MessageCenter = () => import("@/views/MessageCenter.vue");
+const AdminCategory = () => import("@/components/AdminCategory.vue");
 
 
 
@@ -95,7 +96,14 @@ const routes = [
         path: "admin_users",
         name: "adminUsers",
         component: AdminAdminUsers,
-      }]
+      },
+      // 分类管理
+      {
+        path: "admin_category",
+        name: "adminCategory",
+        component: AdminCategory,
+      },
+    ]
   },
   // 404
   {
