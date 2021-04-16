@@ -3,11 +3,11 @@
     <div class="container">
       <!-- 文章标题 -->
       <div class="post_header">
-        <h2 class="post_title">文章标题</h2>
+        <h2 class="post_title">博客标题</h2>
         <el-input
           class="post_titleContent"
           v-model="title"
-          placeholder="请输入文章标题"
+          placeholder="请输入博客标题"
           clearable
         >
           <!-- 计算标题的字数限制 -->
@@ -19,33 +19,33 @@
 
       <!-- 文章标题选择 -->
       <section class="tag_container">
-        <h2 class="post_tag">文章标签</h2>
+        <h2 class="post_tag">博客分类</h2>
         <el-radio
-          v-for="(item, index) in tagsArr"
-          :key="index"
+          v-for="item in tagsArr"
+          :key="item.cate_id"
           v-model="radio"
-          :label="index"
+          :label="item.cate_id"
           class="tag_item"
         >
-          <el-tag :type="index === radio ? '' : 'success'">{{
-            item
+          <el-tag :type="item.cate_id === radio ? '' : 'success'">{{
+            item.cate_name
           }}</el-tag></el-radio
         >
         <el-button size="small" @click="centerDialogVisible = true"
-          >自定义标签</el-button
+          >自定义分类</el-button
         >
         <!-- 添加自定义标签的对话框 -->
         <el-dialog
-          title="自定义标签"
+          title="自定义分类"
           :visible.sync="centerDialogVisible"
           width="30%"
           center
         >
           <div class="dialog_content">
-            <p style="padding-bottom:10px">标签名称</p>
+            <p style="padding-bottom:10px">分类名称</p>
             <el-input
               v-model="diyTag"
-              placeholder="请输入自定义的标签名称"
+              placeholder="请输入自定义的分类名称"
               @keydown.enter.native="addDiyTag"
             ></el-input>
           </div>
@@ -58,13 +58,13 @@
 
       <!-- 文章内容 -->
       <div id="wangeditor">
-        <h2 class="post_contentHeader">文章内容</h2>
+        <h2 class="post_contentHeader">博客内容</h2>
         <div ref="editorElem" class="editorElem"></div>
       </div>
 
       <!-- 提交 -->
       <div class="btn">
-        <el-button type="danger" plain @click="submit">发布文章</el-button>
+        <el-button type="danger" plain @click="submit">发布博客</el-button>
       </div>
     </div>
     <!-- 回到顶部 -->
@@ -89,16 +89,7 @@ export default {
       centerDialogVisible: false, // 是否显示对话框
       diyTag: "", // 自定义标签名称
       // 文章标签数组
-      tagsArr: [
-        "#生活#",
-        "#科技#",
-        "#游戏#",
-        "#教育#",
-        "#文学#",
-        "#情感#",
-        "#军事#",
-        "#人文#",
-      ],
+      tagsArr: [],
     };
   },
   methods: {
@@ -153,7 +144,7 @@ export default {
               data: {
                 title: this.title,
                 content: this.editorContent,
-                tag: this.tagsArr[this.radio],
+                cate_id: this.radio,
               },
             })
               .then(res => {
@@ -197,9 +188,37 @@ export default {
 
     // 添加自定义标签
     addDiyTag() {
-      this.tagsArr.push(`#${this.diyTag}#`);
-      this.radio = this.tagsArr.length - 1;
+      this.$axios({
+        method: "post",
+        url: "/category/add",
+        data: {
+          cate_name: `#${this.diyTag}#`,
+        },
+      })
+        .then(res => {
+          if (res.data.state === 0) {
+            this.tagsArr.push(res.data.cateData);
+            this.radio = this.tagsArr[this.tagsArr.length - 1].cate_id;
+          } else {
+            this.$message.info(res.data.msg);
+          }
+        })
+        .catch(err => console.log(err));
+
       this.centerDialogVisible = false;
+    },
+    // 获取分类数据
+    queryCateData() {
+      this.$axios({
+        method: "get",
+        url: "/category/queryDefault",
+      })
+        .then(res => {
+          if (res.data.state === 0) {
+            this.tagsArr = res.data.list;
+          }
+        })
+        .catch(err => console.log(err));
     },
   },
   watch: {
@@ -215,6 +234,7 @@ export default {
     },
   },
   mounted() {
+    this.queryCateData();
     this.initWangEditor();
     this.changeEditorStyle();
   },

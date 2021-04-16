@@ -275,6 +275,7 @@ export default {
       })
         .then(res => {
           if (res.data.status === 0) {
+            
             this.pageData.total = res.data.total;
             this.tableData = res.data.allPost;
           }

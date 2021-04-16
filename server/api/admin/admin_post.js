@@ -20,16 +20,15 @@ module.exports = (router, crud) => {
                     crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
                     WHERE post_id = ?
                     ORDER BY `+ "`post_createTime`" + ` ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [keyWord], data => {
-                        if (data.length > 0) {
-                            data.forEach(item => {
-                                item.user_password = ""
-                            })
+                        if (data.length < 1) {
+                            res.json({
+                                status: 0,
+                                allPost: [],
+                                total: 0
+                            });
+                            return;
                         }
-                        res.json({
-                            status: 0,
-                            allPost: data,
-                            total: data.length
-                        });
+                        resultPost(data, res, data.length);
                     });
                     break;
                 // 按文章标题或内容查询
@@ -40,16 +39,15 @@ module.exports = (router, crud) => {
                         crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
                         WHERE post_title LIKE "%${keyWord}%" OR post_content LIKE "%${keyWord}%"
                         ORDER BY `+ "`post_createTime`" + ` ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [], data => {
-                            if (data.length > 0) {
-                                data.forEach(item => {
-                                    item.user_password = ""
-                                })
+                            if (data.length < 1) {
+                                res.json({
+                                    status: 0,
+                                    allPost: [],
+                                    total: 0
+                                });
+                                return;
                             }
-                            res.json({
-                                status: 0,
-                                allPost: data,
-                                total: total
-                            });
+                            resultPost(data, res, total);
                         });
                     })
 
@@ -60,27 +58,47 @@ module.exports = (router, crud) => {
                         let total = num[0]["count(post_id)"];
                         crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE user_nickName=? 
                         ORDER BY `+ "`post_createTime`" + ` ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [keyWord], data => {
-                            res.json({
-                                status: 0,
-                                allPost: data,
-                                total: total
-                            });
+                            if (data.length < 1) {
+                                res.json({
+                                    status: 0,
+                                    allPost: [],
+                                    total: 0
+                                });
+                                return;
+                            }
+                            resultPost(data, res, total);
                         })
                     })
                     break;
                 // 按文章标签查询
                 case "3":
-                    crud(`SELECT count(post_id) FROM ` + "`post`" + ` WHERE post_tag = ? `, [keyWord], num => {
-                        let total = num[0]["count(post_id)"];
-                        crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag =? 
-                        ORDER BY `+ "`post_createTime`" + ` ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [keyWord], data => {
+                    crud("SELECT cate_id FROM `category` WHERE cate_name=?", [keyWord], cateData => {
+                        if (cateData.length < 1) {
                             res.json({
                                 status: 0,
-                                allPost: data,
-                                total: total
+                                allPost: [],
+                                total: 0
                             });
+                            return;
+                        }
+                        let { cate_id } = cateData[0];
+                        crud(`SELECT count(post_id) FROM ` + "`post`" + ` WHERE post_tag = ? `, [cate_id], num => {
+                            let total = num[0]["count(post_id)"];
+                            crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag =? 
+                            ORDER BY `+ "`post_createTime`" + ` ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [cate_id], data => {
+                                if (data.length < 1) {
+                                    res.json({
+                                        status: 0,
+                                        allPost: [],
+                                        total: 0
+                                    });
+                                    return;
+                                }
+                                resultPost(data, res, total);
+                            })
                         })
                     })
+
                     break;
                 default:
                     break;
@@ -90,18 +108,28 @@ module.exports = (router, crud) => {
                 let total = num[0]["count(post_id)"];
                 crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
                 ORDER BY `+ "`post_createTime`" + ` ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [], data => {
-                    data.forEach(item => {
-                        item.user_password = ""
-                    })
-                    res.json({
-                        status: 0,
-                        allPost: data,
-                        total
-                    });
+                    resultPost(data, res, total);
                 });
             })
         }
     })
+
+    // 把所有博客数据密码去掉并且获取到标签名
+    const resultPost = (data, res, total) => {
+        data.forEach(item => {
+            item.user_password = "";
+            crud("SELECT cate_name FROM `category` WHERE cate_id=?", [item.post_tag], data => {
+                item.post_tag = data[0].cate_name;
+            })
+        })
+        setTimeout(() => {
+            res.json({
+                status: 0,
+                allPost: data,
+                total
+            });
+        }, 200)
+    }
 
     /**
      * 删除文章
@@ -112,7 +140,7 @@ module.exports = (router, crud) => {
             // 向消息表中添加数据
             const messageData = {
                 from_id,
-                to_id, 
+                to_id,
                 post_id,
                 type: 0,
                 post_title

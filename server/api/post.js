@@ -26,7 +26,7 @@ module.exports = (router, crud) => {
                 post_title: req.body.title,
                 post_content: req.body.content,
                 post_createTime: date,
-                post_tag: req.body.tag
+                post_tag: req.body.cate_id
             }
             crud("INSERT INTO `post` SET ?", objData, data => {
                 res.json({ state: 0 });
@@ -43,9 +43,9 @@ module.exports = (router, crud) => {
     // 过滤敏感词汇
     const filterMingan = (req) => {
         const mgArr = require('../assets/mgWords.json').wordsArr;
-        const { title, content, tag } = req.body;
+        const { title, content } = req.body;
         let minganWeijinArr = [];
-        let reqData = [title, content, tag];
+        let reqData = [title, content];
         reqData.forEach((item) => {
             for (let i = 0; i < mgArr.length; i++) {
                 if (item.includes(mgArr[i])) {
@@ -91,22 +91,36 @@ module.exports = (router, crud) => {
                 let reg = /^#.*#$/; // 以#开头和结尾
                 // 以#开头和结尾的话代表是标签搜索,否则就是对文章标题和内容进行搜索"SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
                 if (reg.test(req.query.search_content)) {
-                    //查询表中对应的所有数据的条数
-                    crud(`SELECT count(post_id) FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag=?`, [req.query.search_content], arr => {
-                        total = arr[0]["count(post_id)"];
-                        crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`,
-                            [req.query.search_content], data => {
-                                data.forEach(item => {
-                                    item.user_password = ""
-                                })
-                                res.json({
-                                    state: 0,
-                                    allPost: data,
-                                    total
+                    crud("SELECT cate_id FROM `category` WHERE cate_name=?", [req.query.search_content], cateData => {
+                        if (cateData.length < 1) {
+                            res.json({
+                                state: 0,
+                                allPost: [],
+                                total: 0
+                            })
+                            return;
+                        }
+                        //查询表中对应的所有数据的条数
+                        crud(`SELECT count(post_id) FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag=?`, [cateData[0].cate_id], arr => {
+                            total = arr[0]["count(post_id)"];
+                            crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id WHERE post_tag=?   ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`,
+                                [cateData[0].cate_id], data => {
+                                    data.forEach(item => {
+                                        item.user_password = "";
+                                        crud("SELECT cate_name FROM `category` WHERE cate_id=?", [item.post_tag], data => {
+                                            item.post_tag = data[0].cate_name;
+                                        })
+                                    })
+                                    setTimeout(() => {
+                                        res.json({
+                                            state: 0,
+                                            allPost: data,
+                                            total
+                                        });
+                                    }, 200)
                                 });
-                            });
+                        })
                     })
-
                 } else {
                     // "SELECT * FROM `post` LEFT JOIN `users` ON post.post_masterId = users.user_id WHERE post_content LIKE '%" + req.query.search_content + "%' OR post_title LIKE '%" + req.query.search_content + "%'  ORDER BY " + sort_rule + ' ' + sort_orderBy + ""
                     crud(`SELECT count(post_id) FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON 
@@ -117,13 +131,18 @@ module.exports = (router, crud) => {
                         WHERE post_content LIKE "%${req.query.search_content}%" OR post_title LIKE "%${req.query.search_content}%" ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`,
                             [], data => {
                                 data.forEach(item => {
-                                    item.user_password = ""
+                                    item.user_password = "";
+                                    crud("SELECT cate_name FROM `category` WHERE cate_id=?", [item.post_tag], data => {
+                                        item.post_tag = data[0].cate_name;
+                                    })
                                 })
-                                res.json({
-                                    state: 0,
-                                    allPost: data,
-                                    total
-                                });
+                                setTimeout(() => {
+                                    res.json({
+                                        state: 0,
+                                        allPost: data,
+                                        total
+                                    });
+                                }, 200)
                             });
                     })
                 }
@@ -133,13 +152,19 @@ module.exports = (router, crud) => {
                 crud(`SELECT * FROM ` + "`post`" + ` LEFT JOIN ` + "`users`" + ` ON post.post_masterId = users.user_id 
             ORDER BY ${sort_rule} ${sort_orderBy} LIMIT ${currentIndex},${pageSize}`, [], data => {
                     data.forEach(item => {
-                        item.user_password = ""
+                        item.user_password = "";
+                        crud("SELECT cate_name FROM `category` WHERE cate_id=?", [item.post_tag], data => {
+                            item.post_tag = data[0].cate_name;
+                        })
                     })
-                    res.json({
-                        state: 0,
-                        allPost: data,
-                        total
-                    });
+                    setTimeout(() => {
+                        res.json({
+                            state: 0,
+                            allPost: data,
+                            total
+                        });
+                    }, 200)
+
                 });
             }
         })
