@@ -155,7 +155,7 @@ module.exports = (router, crud) => {
                         item.user_password = "";
                         crud("SELECT cate_name FROM `category` WHERE cate_id=?", [item.post_tag], data => {
                             item.post_tag = data[0].cate_name;
-                        })
+                        }) 
                     })
                     setTimeout(() => {
                         res.json({
@@ -163,7 +163,7 @@ module.exports = (router, crud) => {
                             allPost: data,
                             total
                         });
-                    }, 200)
+                    }, 100)
 
                 });
             }

@@ -20,17 +20,19 @@
       <!-- 文章标题选择 -->
       <section class="tag_container">
         <h2 class="post_tag">博客分类</h2>
-        <el-radio
-          v-for="item in tagsArr"
-          :key="item.cate_id"
-          v-model="radio"
-          :label="item.cate_id"
-          class="tag_item"
-        >
-          <el-tag :type="item.cate_id === radio ? '' : 'success'">{{
-            item.cate_name
-          }}</el-tag></el-radio
-        >
+        <template v-if="tagsArr.length>0">
+          <el-radio
+            v-for="item in tagsArr"
+            :key="item.cate_id"
+            v-model="radio"
+            :label="item.cate_id"
+            class="tag_item"
+          >
+            <el-tag :type="item.cate_id === radio ? '' : 'success'">{{
+              item.cate_name
+            }}</el-tag></el-radio
+          >
+        </template>
         <el-button size="small" @click="centerDialogVisible = true"
           >自定义分类</el-button
         >

@@ -239,7 +239,7 @@ export default {
   },
   mounted() {
     this.initActiveIndex();
-    // this.adminIsLogin();
+    this.adminIsLogin();
   },
 };
 </script>

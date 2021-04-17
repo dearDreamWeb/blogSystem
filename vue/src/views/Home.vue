@@ -21,7 +21,12 @@
       </div>
     </div>
     <!-- 内容区 -->
-    <div class="container">
+    <div
+      class="container"
+      v-loading="postLoading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+    >
       <!-- 文章遍历 -->
       <ul class="post-wrapper" v-if="allPost.length > 0">
         <li class="post-item" v-for="(item, index) in allPost" :key="index">
@@ -122,11 +127,13 @@ export default {
         { value: 2, label: "阅读次数" },
       ],
       radioValue: "2", //默认是降序
+      postLoading: false,
     };
   },
   methods: {
     // 初始化数据,obj代表的是排序规则
     initData(searchContent) {
+      this.postLoading = true;
       return this.$axios({
         method: "post",
         url: "/get_allPost",
@@ -142,6 +149,7 @@ export default {
           if (res.data.state === 0) {
             this.allPost = res.data.allPost;
             this.total = res.data.total;
+            this.postLoading = false;
           }
         })
         .catch(err => {

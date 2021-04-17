@@ -13,28 +13,27 @@ module.exports = (router, crud) => {
     router.post('/category/add', (req, res) => {
         const { cate_name } = req.body;
         crud("SELECT * FROM `category` WHERE state=? AND cate_name=?", [0, cate_name], queryData => {
-            if (queryData.length > 0) {
+            if (queryData.length < 1) {
+                crud("INSERT INTO `category` SET?", { cate_name }, () => {
+                    crud("SELECT cate_id,cate_name FROM `category` WHERE state=? AND cate_name=?", [0, cate_name], data => {
+                        res.json({
+                            state: 0,
+                            cateData: data[0]
+                        })
+                    })
+                })
+            } else {
                 if (queryData[0].is_default === 1) {
                     res.json({
                         state: 1,
                         msg: '该分类为默认分类，无需添加'
                     })
                 } else {
-                    crud("INSERT INTO `category` SET?", { cate_name }, () => {
-                        crud("SELECT cate_id,cate_name FROM `category` WHERE state=? AND cate_name=?", [0, cate_name], data => {
-                            res.json({
-                                state: 0, 
-                                cateData: queryData[0]
-                            })
-                        })
+                    res.json({
+                        state: 0,
+                        cateData: queryData[0]
                     })
                 }
-
-            } else {
-                res.json({
-                    state: 0,
-                    cateData: queryData[0]
-                })
             }
         })
     })

@@ -7,4 +7,6 @@ module.exports = (router, crud) => {
     require("./admin_comments")(router, crud);
     // 后台用户
     require("./admin_users")(router, crud);
+    // 后台博客分类
+    require("./admin_category")(router, crud);
 }
