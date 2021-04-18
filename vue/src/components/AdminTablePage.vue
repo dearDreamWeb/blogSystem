@@ -2,6 +2,18 @@
   <div class="admin_postLists">
     <header class="header_search">
       <div class="select_container">
+        <!-- 日期选择器 -->
+        <el-date-picker
+          v-model="dateVal"
+          type="daterange"
+          align="right"
+          unlink-panels
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          :picker-options="pickerOptions"
+          class="datePicker_wrap"
+        ></el-date-picker>
         <el-input
           placeholder="请输入关键字"
           v-model="keyWord"
@@ -208,6 +220,39 @@ export default {
       dialogTableVisible: false, // 弹出框
       sort_orderBy: 0, //排列顺序 0代表desc；1代表asc
       tableData: [], // 表格文章数据
+      dateVal: "", // 日期范围
+            // 日期最近的范围
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三个月",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
     };
   },
   methods: {
@@ -275,7 +320,6 @@ export default {
       })
         .then(res => {
           if (res.data.status === 0) {
-            
             this.pageData.total = res.data.total;
             this.tableData = res.data.allPost;
           }
@@ -454,8 +498,13 @@ export default {
   background-color: $div_bgColor;
   // 头部搜索
   .select_container {
+    display: flex;
     padding-bottom: 20px;
-    width: 50%;
+    width: 80%;
+    .datePicker_wrap {
+      margin-right: 10px;
+      min-width: 400px;
+    }
     .select_wrap {
       width: 150px;
     }
