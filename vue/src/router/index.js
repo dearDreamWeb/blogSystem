@@ -42,6 +42,12 @@ const routes = [
     name: "editPostLink",
     component: EditPost
   },
+  // 修改博客
+  {
+    path: "/editPost/:post_id",
+    name: "editPostId",
+    component: EditPost
+  },
   // 某个文章
   {
     path: "/post/:post_id",

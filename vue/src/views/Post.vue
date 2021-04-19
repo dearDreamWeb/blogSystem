@@ -30,6 +30,12 @@
           <div class="readCount item">
             <span class="text">阅读数</span>{{ postData.post_read_count }}
           </div>
+          <router-link
+            v-if="postData.post_masterId===getUserId"
+            class="edit_btn item"
+            :to="`/editPost/${postData.post_id}`"
+            >编辑</router-link
+          >
         </div>
       </div>
       <!-- 主体 -->
@@ -67,6 +73,7 @@ export default {
     return {
       postData: {},
       already_parise: false, //是否点赞过了
+      user_id: "",
     };
   },
   methods: {
@@ -176,6 +183,12 @@ export default {
       });
     },
   },
+  computed: {
+    // 获取用户id
+    getUserId() {
+      return this.$store.getters.getUserInfo.user_id;
+    },
+  },
   created() {
     this.initData(this.$route.params.post_id);
   },
@@ -223,6 +236,9 @@ export default {
           .text {
             padding-right: 0.5rem;
           }
+        }
+        .edit_btn {
+          color: $diy_blue;
         }
         .userName {
           color: $diy_blue;

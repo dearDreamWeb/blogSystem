@@ -20,7 +20,7 @@
       <!-- 文章标题选择 -->
       <section class="tag_container">
         <h2 class="post_tag">博客分类</h2>
-        <template v-if="tagsArr.length>0">
+        <template v-if="tagsArr.length > 0">
           <el-radio
             v-for="item in tagsArr"
             :key="item.cate_id"
@@ -96,67 +96,113 @@ export default {
   },
   methods: {
     /**
+     * 如果是修改博客初始化博客信息
+     */
+    async initPostInfo() {
+      const { post_id } = this.$route.params;
+      await this.$axios({
+        method: "get",
+        url: "/admin/postLists",
+        params: {
+          selectedValue: 0,
+          keyWord: post_id,
+          currentPage: 1,
+          pageSize: 1,
+        },
+      })
+        .then(res => {
+          // 填充标题标签
+          if (res.data.status === 0 && res.data.allPost.length > 0) {
+            const { post_content, post_title, post_tag } = res.data.allPost[0];
+            this.editorContent = post_content;
+            this.editor.txt.html(this.editorContent);
+            this.title = post_title;
+            this.diyTag = post_tag.replaceAll("#", "");
+            // 当标签为默认标签的话，直接选择，反之调用addDiyTag添加分类
+            let isDefaultTag = true;
+            this.tagsArr.forEach(item => {
+              if (post_tag === item.cate_name) {
+                this.radio = item.cate_id;
+                isDefaultTag = false;
+              }
+            });
+            isDefaultTag && this.addDiyTag();
+          } else {
+            this.$router.push("/");
+            this.$message.info("编辑博客错误");
+          }
+        })
+        .catch(err => console.log(err));
+    },
+    /**
      * 初始化wangeditor富文本编辑器
      */
     initWangEditor() {
-      this.editor = new E(this.$refs.editorElem);
-      this.editor.customConfig.uploadImgShowBase64 = true; // 使用 base64 保存图片
-      // 编辑器的事件，每次改变会获取其html内容
-      this.editor.customConfig.onchange = html => {
-        this.editorContent = html;
-        this.catchData(this.editorContent); // 把这个html通过catchData的方法传入父组件
-      };
-      this.editor.customConfig.menus = [
-        // 菜单配置
-        "head", // 标题
-        "bold", // 粗体
-        "fontSize", // 字号
-        "fontName", // 字体
-        "italic", // 斜体
-        "underline", // 下划线
-        "strikeThrough", // 删除线
-        "foreColor", // 文字颜色
-        "backColor", // 背景颜色
-        "link", // 插入链接
-        "list", // 列表
-        "justify", // 对齐方式
-        "quote", // 引用
-        "emoticon", // 表情
-        "image", // 插入图片
-        "table", // 表格
-        // "code", // 插入代码
-        "undo", // 撤销
-        "redo", // 重复
-      ];
-      this.editor.create(); // 创建富文本实例
+      return new Promise(resolve => {
+        this.editor = new E(this.$refs.editorElem);
+        this.editor.customConfig.uploadImgShowBase64 = true; // 使用 base64 保存图片
+        // 编辑器的事件，每次改变会获取其html内容
+        this.editor.customConfig.onchange = html => {
+          this.editorContent = html;
+          this.catchData(this.editorContent); // 把这个html通过catchData的方法传入父组件
+        };
+        this.editor.customConfig.menus = [
+          // 菜单配置
+          "head", // 标题
+          "bold", // 粗体
+          "fontSize", // 字号
+          "fontName", // 字体
+          "italic", // 斜体
+          "underline", // 下划线
+          "strikeThrough", // 删除线
+          "foreColor", // 文字颜色
+          "backColor", // 背景颜色
+          "link", // 插入链接
+          "list", // 列表
+          "justify", // 对齐方式
+          "quote", // 引用
+          "emoticon", // 表情
+          "image", // 插入图片
+          "table", // 表格
+          // "code", // 插入代码
+          "undo", // 撤销
+          "redo", // 重复
+        ];
+        this.editor.create(); // 创建富文本实例
+        resolve();
+      });
     },
 
     /**
      * 提交数据
      */
     submit() {
+      let type = this.$route.params.post_id ? "updatePost" : "addPost"; // 获取是添加还是修改博客
       // 先校验文章的标题和内容是否为空，都不为空再提交数据
       let reg = /^\s+$/;
       if (!reg.test(this.title) && !this.editorContent == false) {
         this.$confirm("是否确定发布", "提示")
           .then(() => {
+            let url = type === "addPost" ? "/setPost" : "/updatePost";
             this.$axios({
               method: "post",
-              url: "/setPost",
+              url,
               data: {
                 title: this.title,
                 content: this.editorContent,
                 cate_id: this.radio,
+                post_id: this.$route.params.post_id,
               },
             })
               .then(res => {
                 if (res.data.state === 0) {
-                  this.$message.success("发布成功");
+                  this.$message.success(
+                    `${type === "addPost" ? "发布" : "修改"}成功`
+                  );
                   this.title = "";
                   this.editorContent = "";
                   document.querySelector(".w-e-text").innerHTML = "";
-                } else {
-                  this.$message.info(res.data.mess);
+                  this.$router.push("/");
                 }
               })
               .catch(err => {
@@ -164,7 +210,7 @@ export default {
               });
           })
           .catch(() => {
-            this.$message.info("已取消发布");
+            this.$message.info(`已取消${type === "addPost" ? "发布" : "修改"}`);
           });
       } else {
         this.$message.error("文章标题和内容不能为空");
@@ -211,7 +257,7 @@ export default {
     },
     // 获取分类数据
     queryCateData() {
-      this.$axios({
+      return this.$axios({
         method: "get",
         url: "/category/queryDefault",
       })
@@ -235,10 +281,12 @@ export default {
       }
     },
   },
-  mounted() {
-    this.queryCateData();
-    this.initWangEditor();
-    this.changeEditorStyle();
+  async mounted() {
+    await this.queryCateData();
+    await this.initWangEditor();
+    await this.changeEditorStyle();
+    // 如果post_id存在说明是要修改博客
+    this.$route.params.post_id && this.initPostInfo();
   },
   beforeRouteEnter(to, from, next) {
     // 如果未登录返回首页，提示用户登录

@@ -1,3 +1,5 @@
+const { post } = require('request');
+
 module.exports = (router, crud) => {
     const request = require('request');
     /**
@@ -10,7 +12,7 @@ module.exports = (router, crud) => {
 
             if (filterInfo.length > 0) {
                 res.json({
-                    status: 2,
+                    state: 2,
                     mess: `含有敏感词汇${filterInfo.join('，')}`
                 })
                 return;
@@ -33,13 +35,41 @@ module.exports = (router, crud) => {
             })
         } else {
             res.json({
-                status: 1,
+                state: 1,
                 errCode: 0,
                 mess: "用户未登录，请先登录"
             })
         }
     });
 
+    /**
+     * 
+     * 修改博客 
+     */
+    router.post("/updatePost", (req, res) => {
+        if (req.session.userInfo) {
+            let filterInfo = filterMingan(req);
+            if (filterInfo.length > 0) {
+                res.json({
+                    state: 2,
+                    mess: `含有敏感词汇${filterInfo.join('，')}`
+                })
+                return;
+            }
+            const { title, content, cate_id, post_id } = req.body;
+            crud("UPDATE `post` set post_title=?,post_content=?,post_tag=? WHERE post_id=?", [title, content, cate_id, post_id], () => {
+                res.json({
+                    state: 0
+                })
+            })
+        } else {
+            res.json({
+                state: 1,
+                errCode: 0,
+                mess: "用户未登录，请先登录"
+            })
+        }
+    })
     // 过滤敏感词汇
     const filterMingan = (req) => {
         const mgArr = require('../assets/mgWords.json').wordsArr;
@@ -155,7 +185,7 @@ module.exports = (router, crud) => {
                         item.user_password = "";
                         crud("SELECT cate_name FROM `category` WHERE cate_id=?", [item.post_tag], data => {
                             item.post_tag = data[0].cate_name;
-                        }) 
+                        })
                     })
                     setTimeout(() => {
                         res.json({
