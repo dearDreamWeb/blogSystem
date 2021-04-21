@@ -65,6 +65,7 @@ require("echarts/lib/component/tooltip");
 require("echarts/lib/component/legend");
 require("echarts/lib/component/grid");
 require("echarts/lib/component/axis");
+require("echarts/lib/component/toolbox");
 //引入模型Series
 require("echarts/lib/model/Series");
 export default {
@@ -148,6 +149,12 @@ export default {
           trigger: "item",
           formatter: "{a} <br/>{b} : {c} ({d}%)",
         },
+        toolbox: {
+          show: true,
+          feature: {
+            saveAsImage: {},
+          },
+        },
         legend: {
           orient: "vertical",
           left: "left",
@@ -214,6 +221,12 @@ export default {
             <span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#e4393c;"></span>
             人数：${count}
             `;
+          },
+        },
+        toolbox: {
+          show: true,
+          feature: {
+            saveAsImage: {},
           },
         },
         grid: {
@@ -292,6 +305,12 @@ export default {
             label: {
               backgroundColor: "#6a7985",
             },
+          },
+        },
+        toolbox: {
+          show: true,
+          feature: {
+            saveAsImage: {},
           },
         },
         xAxis: {
